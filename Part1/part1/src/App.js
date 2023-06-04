@@ -25,27 +25,48 @@ const Button = (props) =>{
   )
 }
 
-const App = () => {
-
-  const name = 'Yogesh'
-  const age = 25
-  const [counter, setCounter] = useState(0)
-  
-  const increaseByOne = () => {
-    setCounter(counter + 1)
+const History = ({allClicks}) =>{
+  if(allClicks.length === 0){
+    return (
+      <div>
+        the app is used by pressing buttons.
+      </div>
+    )
   }
-  const decreaseByOne = () => setCounter(counter - 1)
-  const resetCounter = () => setCounter(0)
-
-  console.log(counter)
   return (
     <div>
-      <h1>Greetings</h1>
-      <Hello name={name} age={age} />
-      <Display counter={counter}/>
-      <Button handleClick={increaseByOne} text="Increment"/>
-      <Button handleClick={decreaseByOne} text="Decrement"/>
-      <Button handleClick={resetCounter} text="Reset"/>
+      Button press history: {allClicks.join(' ')}
+    </div>
+  )
+}
+
+const App = () => {
+
+  const [clicks, setClicks] = useState({
+    left: 0, right: 0
+  })
+  const [allClicks, setAllClicks] = useState([])
+
+  const setLeft = () => {
+    setAllClicks(allClicks.concat('L'))
+    setClicks({
+      left: clicks.left + 1, right: clicks.right
+    })
+  }
+  const setRight = () => {
+    setAllClicks(allClicks.concat('R'))
+    setClicks({
+      left: clicks.left, right: clicks.right + 1
+    })
+  }
+
+  return (
+    <div>
+      {clicks.left}
+      <Button handleClick={setLeft} text='Left'/>
+      <Button handleClick={setRight} text='Right'/>
+      {clicks.right}
+      <History allClicks={allClicks}/>
     </div>
   )
 }
