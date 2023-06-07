@@ -3,6 +3,11 @@ import { useState } from 'react'
 const getRandomInt = (min, max) => {
     return Math.floor(Math.random() * (max - min) + min)
 }
+
+const setVote = (points, index) => {
+    points[index] += 1
+    return  points
+}
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -16,10 +21,13 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState(new Array(anecdotes.length).fill(0))
 
   return (
     <div>
       <p>{anecdotes[selected]}</p>
+      <p>has {points[selected]} votes</p>
+      <button onClick={() => {setPoints(setVote(points, selected))}}>vote</button>
       <button onClick={() => {setSelected(getRandomInt(0, anecdotes.length))}}>next anecdote</button>
     </div>
   )
