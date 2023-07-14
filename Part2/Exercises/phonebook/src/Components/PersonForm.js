@@ -1,7 +1,7 @@
 import personService from '../Services/Persons'
 import { useState } from 'react'
 
-const PersonForm = ({persons, setPersons}) => {
+const PersonForm = ({persons, setPersons, setSuccessMessage, setErrorMessage}) => {
     const [newName, setNewName] = useState('')  
     const [newNumber, setNewNumber] = useState('')
 
@@ -24,12 +24,23 @@ const PersonForm = ({persons, setPersons}) => {
               .then(personObject => {
                 setPersons(persons.map(p => p.id === person.id ? {...person, ...newPerson} : p))
               })
+              .catch(error => {
+                setErrorMessage(`Information of ${person.name} has already been removed from server`)
+                setInterval(() => {
+                  setErrorMessage(null)
+                }, 5000)
+                setPersons(persons.filter(p => p.id !== person.id))
+              })
           }
         }else{
           personService
             .create(newPerson)
             .then(personObject => {
               setPersons(persons.concat(personObject))
+              setSuccessMessage(`Added ${personObject.name}`)
+              setInterval(() => {
+                setSuccessMessage(null)
+              }, 5000)
               setNewName('')
               setNewNumber('')
             })
