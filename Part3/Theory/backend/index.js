@@ -1,29 +1,9 @@
+require('dotenv').config()
 const express = require("express");
 const cors = require('cors')
 const mongoose = require('mongoose')
 const Note = require('./models/note')
-
 const app = express();
-const password = process.argv[2]
-const url = `mongodb+srv://mainUser:${password}@cluster0.spqnyh8.mongodb.net/noteApp?retryWrites=true&w=majority`
-
-mongoose.set('strictQuery', false)
-mongoose.connect(url)
-
-const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean
-})
-
-noteSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
-const Note = mongoose.model('Note', noteSchema)
 
 app.use(express.static('build'))
 app.use(cors())
@@ -58,15 +38,11 @@ app.get("/api/notes", (request, response) => {
   })
 });
 
-// app.get("/api/notes/:id", (request, response) => {
-//   const id = Number(request.params.id);
-//   const note = notes.find((note) => note.id === id);
-//   if (note) {
-//     response.json(note);
-//   } else {
-//     response.status(404).send('No note available with specified id');
-//   }
-// });
+app.get("/api/notes/:id", (request, response) => {
+  Note.findById(request.params.id).then( note => {
+    response.json(note)
+  })
+});
 
 // app.delete('/api/notes/:id', (request, response) =>{
 //   const id = Number(request.params.id)
@@ -79,22 +55,22 @@ app.get("/api/notes", (request, response) => {
 //   return maxId + 1
 // }
 
-// app.post('/api/notes', (request, response) => {
-//   const note = request.body
+app.post('/api/notes', (request, response) => {
+  const note = request.body
 
-//   if(!note.content){
-//     return response.status(400).json({
-//       error: "content missing"
-//     })
-//   }
-//   const newNote = {
-//     content: note.content,
-//     important: note.important || false,
-//     id: generateId()
-//   }
-//   notes = notes.concat(newNote)
-//   response.json(newNote)
-// })
+  if(!note.content){
+    return response.status(400).json({
+      error: "content missing"
+    })
+  }
+  const newNote = new Note({
+    content: note.content,
+    important: note.important || false
+  })
+  newNote.save().then(savedNote => {
+    response.json(savedNote)
+  })
+})
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint'})
