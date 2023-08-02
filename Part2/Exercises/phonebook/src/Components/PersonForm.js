@@ -22,10 +22,10 @@ const PersonForm = ({persons, setPersons, setSuccessMessage, setErrorMessage}) =
             personService
               .update(person.id, newPerson)
               .then(personObject => {
-                setPersons(persons.map(p => p.id === person.id ? {...person, ...newPerson} : p))
+                setPersons(persons.map(p => p.id === person.id ? {...person, ...personObject} : p))
               })
               .catch(error => {
-                setErrorMessage(`Information of ${person.name} has already been removed from server`)
+                setErrorMessage(error.response.data.error.message)
                 setInterval(() => {
                   setErrorMessage(null)
                 }, 5000)
@@ -43,6 +43,12 @@ const PersonForm = ({persons, setPersons, setSuccessMessage, setErrorMessage}) =
               }, 5000)
               setNewName('')
               setNewNumber('')
+            })
+            .catch(error => {
+              setErrorMessage(error.response.data.error.message)
+              setInterval(() => {
+                setErrorMessage(null)
+              }, 5000)
             })
         }
     }

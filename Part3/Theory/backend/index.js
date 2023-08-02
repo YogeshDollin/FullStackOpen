@@ -1,18 +1,17 @@
 require('dotenv').config()
-const express = require("express");
+const express = require('express')
 const cors = require('cors')
-const mongoose = require('mongoose')
 const Note = require('./models/note')
-const app = express();
+const app = express()
 
 app.use(express.static('build'))
 app.use(cors())
 app.use(express.json())
 
 const requestLogger = (request, response, next) => {
-  console.log('Method: ', request.method);
-  console.log('Path: ', request.path );
-  console.log('---');
+  console.log('Method: ', request.method)
+  console.log('Path: ', request.path )
+  console.log('---')
   next()
 }
 
@@ -26,19 +25,19 @@ app.use(requestLogger)
 //     content: "GET and POST are the most important methods of HTTP protocol",
 //     important: true,
 //   },
-// ];
+// ]
 
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World!</h1>");
-});
+app.get('/', (request, response) => {
+  response.send('<h1>Hello World!</h1>')
+})
 
-app.get("/api/notes", (request, response) => {
+app.get('/api/notes', (request, response) => {
   Note.find({}).then(notes =>{
-    response.json(notes);
+    response.json(notes)
   })
-});
+})
 
-app.get("/api/notes/:id", (request, response, next) => {
+app.get('/api/notes/:id', (request, response, next) => {
   Note.findById(request.params.id)
     .then( note => {
       if(note){
@@ -50,9 +49,9 @@ app.get("/api/notes/:id", (request, response, next) => {
     .catch(error => {
       next(error)
     })
-});
+})
 
-app.delete('/api/notes/:id', (request, response) =>{
+app.delete('/api/notes/:id', (request, response, next) =>{
   Note.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
@@ -97,13 +96,13 @@ const unknownEndpoint = (request, response) => {
 }
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+  console.log(`Server listening on port ${PORT}`)
+})
 
 const errorHandler = (error, request, response, next) => {
-  console.log(error);
+  console.log(error)
 
   if(error.name === 'CastError'){
     return response.status(400).send({error: 'malformatted id'})
