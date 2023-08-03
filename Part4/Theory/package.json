@@ -6,10 +6,10 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf Part3/Theory/backend/build && npm --prefix ./Part2/Theory/part2/ run build && cp -r ./Part2/Theory/part2/build ./Part4/Theory/backend/",
+    "build:ui": "rm -rf Part4/Theory/backend/build && npm --prefix ./Part2/Theory/part2/ run build && cp -r ./Part2/Theory/part2/build ./Part4/Theory/backend/",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "jest --verbose"
   },
   "author": "Yogesh Dollin",
   "license": "",
@@ -21,6 +21,10 @@
   },
   "devDependencies": {
     "eslint": "^8.46.0",
+    "jest": "^29.6.2",
     "nodemon": "^3.0.1"
+  },
+  "jest": {
+    "testEnvironment" : "node"
   }
 }
