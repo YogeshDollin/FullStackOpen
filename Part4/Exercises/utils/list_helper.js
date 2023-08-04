@@ -62,9 +62,29 @@ const mostBlogs = (blogs) => {
     return !mostBlogs.hasOwnProperty('author') ? {} : authorsWithMostBlogs[0]
 }
 
+const mostLikes = (blogs) => {
+    let maxLikes = {likes: 0}
+    const authorsWithMostLikes = []
+
+    const dict = authorBlogsDictionary(blogs)
+    for(author in dict){
+        const authorTotalLikes = totalLikes(dict[author])
+        if(maxLikes.likes < authorTotalLikes){
+            maxLikes = {author: author, likes: authorTotalLikes}
+        }
+        else if (maxLikes.likes === authorTotalLikes){
+            authorsWithMostLikes.push(maxLikes)
+            maxLikes = {author: author, likes: authorTotalLikes}
+        }
+    }
+    authorsWithMostLikes.push(maxLikes)
+    return !maxLikes.hasOwnProperty('author') ? {} : authorsWithMostLikes[0]
+}
+
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
