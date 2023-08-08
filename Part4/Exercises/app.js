@@ -15,7 +15,7 @@ mongoose.connect(config.MONGODB_URL)
         logger.info('connected to DB')
     })
     .catch(error => {
-        logger.error('error connecting to DB error: ', error.message);
+        logger.error('error connecting to DB error: ', error.message)
     })
 
 module.exports = app
