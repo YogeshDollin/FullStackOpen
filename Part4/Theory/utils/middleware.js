@@ -13,8 +13,8 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
-  logger.info(error)
-
+  // logger.info(error)
+  logger.info('----------------error handler called--------------')
   if(error.name === 'CastError'){
     return response.status(400).send({ error: 'malformatted id' })
   }
