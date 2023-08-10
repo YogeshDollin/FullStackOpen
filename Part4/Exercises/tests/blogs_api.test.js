@@ -106,12 +106,28 @@ describe('api delete testing', ()  => {
         expect(titles).not.toContain(blogToDelete.title)
     })
 
-    test('delete fails with code 400 if ID is invalid', async () => {
-        const id = helper.nonExistingId();
-        console.log('Non-Exisiting ID: ', id)
+    test('delete returns 204 even if ID is not exist', async () => {
+        const id = await helper.nonExistingId();
         await api
             .delete(`/api/blogs/${id}`)
-            .expect(400)
+            .expect(204)
+    })
+})
+
+describe('api put testing', () => {
+    test('update likes returns with code 200 ', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const updateBlog = blogsAtStart[0]
+        updateBlog.likes += 2
+        console.log(updateBlog)
+        await api
+            .put(`/api/blogs/${updateBlog.id}`)
+            .send({likes: updateBlog.likes})
+            .expect(200)
+
+        const blogsAtEnd = await helper.blogsInDb()
+        updatedBlog = blogsAtEnd.filter(b => b.id === updateBlog.id)[0]
+        expect(updateBlog.likes).toBe(updatedBlog.likes)
     })
 })
 
