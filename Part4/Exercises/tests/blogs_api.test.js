@@ -12,7 +12,7 @@ beforeEach(async () => {
     await Promise.all(promiseArray)
 }, 10000)
 
-describe('api testing', () => {
+describe('api get testing', () => {
     test('Should receive all the blogs', async () => {
         const response = await api
             .get('/api/blogs/')
@@ -21,6 +21,14 @@ describe('api testing', () => {
         expect(response.body).toHaveLength(6)
     })
 
+    test('id property should be defined for each blogs', async () => {
+        const dbBlogs = await helper.blogsInDb()
+        expect(dbBlogs[0].id).toBeDefined()
+    })
+})
+
+describe('api post testing', () => {
+    
     test('Should add the blog in the database', async () => {
         const newBlog = {
             title: 'A new Blog',
@@ -28,22 +36,17 @@ describe('api testing', () => {
             url: 'YogeshDollin.blogspot.com',
             likes: 10
         }
-
+    
         await api
             .post('/api/blogs')
             .send(newBlog)
             .expect(201)
             .expect('Content-type', /application\/json/)
-
+    
         const dbBlogs = await helper.blogsInDb()
         expect(dbBlogs).toHaveLength(helper.initialBlogs.length + 1)
         const titles = dbBlogs.map(b => b.title)
         expect(titles).toContain(newBlog.title)
-    })
-
-    test('id property should be defined for each blogs', async () => {
-        const dbBlogs = await helper.blogsInDb()
-        expect(dbBlogs[0].id).toBeDefined()
     })
 
     test('like property should be zero if no value is sent in request', async () => {
@@ -84,6 +87,30 @@ describe('api testing', () => {
         await api
             .post('/api/blogs')
             .send(blogWithoutTitle)
+            .expect(400)
+    })
+})
+
+describe('api delete testing', ()  => {
+    test('delete successfully with code 204 if ID is valid', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blogToDelete = blogsAtStart[0]
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+
+        const blogsAtEnd = await helper.blogsInDb()
+        expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+
+        const titles = blogsAtEnd.map(b => b.title)
+        expect(titles).not.toContain(blogToDelete.title)
+    })
+
+    test('delete fails with code 400 if ID is invalid', async () => {
+        const id = helper.nonExistingId();
+        console.log('Non-Exisiting ID: ', id)
+        await api
+            .delete(`/api/blogs/${id}`)
             .expect(400)
     })
 })

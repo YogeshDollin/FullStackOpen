@@ -1,4 +1,5 @@
 const blogsRouter = require('express').Router()
+const { response } = require('../../Theory/app')
 const Blog = require('../models/blog')
 
 blogsRouter.get('/', async (request, response) => {
@@ -8,12 +9,13 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response, next) => {
     const blog = new Blog(request.body)
-    try {
-        const savedBlog = await blog.save()
-        response.status(201).json(savedBlog)   
-    } catch (error) {
-        response.status(400).json({error: error})
-    }
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog)
+})
+
+blogsRouter.delete('/:id', async (request, response) => {
+    await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
 })
 
 module.exports = blogsRouter
