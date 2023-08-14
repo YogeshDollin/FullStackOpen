@@ -19,7 +19,6 @@ const api = supertest(app)
 
 beforeEach(async () => {
     await Note.deleteMany({})
-    console.log('cleared')
 
     const noteObjects = helper.initialNotes.map(note => new Note(note))
     const promiseArray = noteObjects.map(note => note.save())
