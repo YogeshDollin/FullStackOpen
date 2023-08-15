@@ -36,4 +36,62 @@ describe('when there is initally one user in db', () => {
         const usernames = usersAtEnd.map(u => u.username)
         expect(usernames).toContain(newUser.username)
     })
+
+    test('creation fails when username is not unique', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: "root",
+            name: "Taylor swift",
+            password: 'blankSpace'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-type', /application\/json/)
+
+        expect(result.body.error).toContain('expected `username` to be unique')
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toEqual(usersAtStart)
+    })
+
+    test('creation fails when username is less than 3 characters', async () => {
+        const usersAtStart = await helper.usersInDb()
+        const newUser = {
+            username: "ta",
+            name: "Taylor swift",
+            password: 'blankSpace'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-type', /application\/json/)
+
+        expect(result.body.error).toContain('Path `username` (`ta`) is shorter than the minimum allowed length')
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toEqual(usersAtStart)
+    })
+
+    test('creation fails when password is less than 3 characters', async () => {
+        const usersAtStart = await helper.usersInDb()
+        const newUser = {
+            username: "ta",
+            name: "Taylor swift",
+            password: 'bl'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-type', /application\/json/)
+
+        expect(result.body.error).toContain('password is required and should be at least 3 characters long')
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toEqual(usersAtStart)
+    })
 })
