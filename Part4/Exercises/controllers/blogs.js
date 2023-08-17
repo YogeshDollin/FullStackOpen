@@ -14,6 +14,10 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response, next) 
     const body = request.body
     const user = request.user
 
+    if(!user){
+        return response.status(401).json({error: "token invalid"})
+    }
+
     const blog = new Blog({
         title: body.title,
         author: body.author,
@@ -38,7 +42,10 @@ blogsRouter.delete('/:id', middleware.userExtractor , async (request, response) 
         user.blogs = user.blogs.filter(b => b._id.toString() !== blog.id)
         await user.save()
         response.status(204).end()
-    }else{
+    }else if(!blog){
+        response.status(404).json({error: "invalid blog id"})
+    }
+    else{
         response.status(401).json({error: "token invalid"})
     }
 })

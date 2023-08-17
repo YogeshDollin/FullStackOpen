@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const User = require('../models/user')
 const app = require('../app')
 const supertest = require('supertest')
@@ -93,5 +94,9 @@ describe('when there is initally one user in db', () => {
         expect(result.body.error).toContain('password is required and should be at least 3 characters long')
         const usersAtEnd = await helper.usersInDb()
         expect(usersAtEnd).toEqual(usersAtStart)
+    })
+
+    afterAll(async () => {
+        mongoose.connection.close()
     })
 })

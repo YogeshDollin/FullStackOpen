@@ -7,7 +7,11 @@ const Blog = require('../models/blog')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
-    const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
+    const userFirst = await helper.getFirstUserInDb()
+    const blogObjects = helper.initialBlogs.map(blog => {
+        blog.user = userFirst.id
+        return new Blog(blog)
+    })
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
 }, 10000)
@@ -28,8 +32,8 @@ describe('api get testing', () => {
 })
 
 describe('api post testing', () => {
-    
     test('Should add the blog in the database', async () => {
+        const token = await helper.getToken()
         const newBlog = {
             title: 'A new Blog',
             author: 'Yogesh',
@@ -40,6 +44,7 @@ describe('api post testing', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `Bearer ${token}`)
             .expect(201)
             .expect('Content-type', /application\/json/)
     
@@ -49,7 +54,25 @@ describe('api post testing', () => {
         expect(titles).toContain(newBlog.title)
     })
 
+    test('Should return 401 if token is not sent along with request', async () => {
+        const newBlog = {
+            title: 'A new Blog',
+            author: 'Yogesh',
+            url: 'YogeshDollin.blogspot.com',
+            likes: 10
+        }
+    
+        const resp = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
+            .expect('Content-type', /application\/json/)
+    
+        expect(resp.body.error).toContain('token invalid')
+    })
+
     test('like property should be zero if no value is sent in request', async () => {
+        const token = await helper.getToken()
         const newBlog = {
             title: 'new Blog2',
             author: "Anonymous",
@@ -59,12 +82,13 @@ describe('api post testing', () => {
         const resp = await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `Bearer ${token}`)
             .expect(201)
             .expect('Content-type', /application\/json/)
-        console.log(resp.body)
     })
 
     test('response should 400 bad request if title is missing', async () => {
+        const token = await helper.getToken()
         const blogWithoutTitle = {
             author: "without title",
             url: "withoutTitle.blogspot.com",
@@ -73,11 +97,13 @@ describe('api post testing', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(blogWithoutTitle)
             .expect(400)
     })
 
     test('response should 400 bad request if url is missing', async () => {
+        const token = await helper.getToken()
         const blogWithoutTitle = {
             title: "new blog3",
             author: "without title",
@@ -86,6 +112,7 @@ describe('api post testing', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(blogWithoutTitle)
             .expect(400)
     })
@@ -93,10 +120,12 @@ describe('api post testing', () => {
 
 describe('api delete testing', ()  => {
     test('delete successfully with code 204 if ID is valid', async () => {
+        const token = await helper.getToken()
         const blogsAtStart = await helper.blogsInDb()
         const blogToDelete = blogsAtStart[0]
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(204)
 
         const blogsAtEnd = await helper.blogsInDb()
@@ -106,11 +135,21 @@ describe('api delete testing', ()  => {
         expect(titles).not.toContain(blogToDelete.title)
     })
 
-    test('delete returns 204 even if ID is not exist', async () => {
+    test('delete fails with code 401 if token is not present', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blogToDelete = blogsAtStart[0]
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(401)
+    })
+
+    test('delete returns 404 if ID does not exist', async () => {
+        const token = await helper.getToken()
         const id = await helper.nonExistingId();
         await api
             .delete(`/api/blogs/${id}`)
-            .expect(204)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(404)
     })
 })
 
@@ -119,7 +158,6 @@ describe('api put testing', () => {
         const blogsAtStart = await helper.blogsInDb()
         const updateBlog = blogsAtStart[0]
         updateBlog.likes += 2
-        console.log(updateBlog)
         await api
             .put(`/api/blogs/${updateBlog.id}`)
             .send({likes: updateBlog.likes})

@@ -1,5 +1,7 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const config = require('../utils/config')
 
 const listWithOneblog = [
     {
@@ -8,6 +10,7 @@ const listWithOneblog = [
         author: 'Edsger W. Dijkstra',
         url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
         likes: 5,
+        user: '64dc4fc873301250630c986c',
         __v: 0
     }
   ]
@@ -18,6 +21,7 @@ const initialBlogs = [
     title: "React patterns",
     author: "Michael Chan",
     url: "https://reactpatterns.com/",
+    user: '64dc4fc873301250630c986c',
     likes: 7,
     __v: 0
   },
@@ -27,6 +31,7 @@ const initialBlogs = [
     author: "Edsger W. Dijkstra",
     url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
     likes: 5,
+    user: '64dc4fc873301250630c986c',
     __v: 0
   },
   {
@@ -35,6 +40,7 @@ const initialBlogs = [
     author: "Edsger W. Dijkstra",
     url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
     likes: 12,
+    user: '64dc4fc873301250630c986c',
     __v: 0
   },
   {
@@ -43,6 +49,7 @@ const initialBlogs = [
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
     likes: 10,
+    user: '64dc4fc873301250630c986c',
     __v: 0
   },
   {
@@ -51,6 +58,7 @@ const initialBlogs = [
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
     likes: 0,
+    user: '64dc4fc873301250630c986c',
     __v: 0
   },
   {
@@ -59,6 +67,7 @@ const initialBlogs = [
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
+    user: '64dc4fc873301250630c986c',
     __v: 0
   }  
 ]
@@ -85,4 +94,19 @@ const usersInDb = async() => {
   return users.map(u => u.toJSON())
 }
 
-  module.exports = {listWithOneblog, initialBlogs, blogsInDb, nonExistingId, usersInDb}
+const getFirstUserInDb = async () => {
+  const users = await User.find({})
+  return users[0]
+}
+
+const getToken = async () => {
+  const user = await getFirstUserInDb()
+  const userForToken = {
+    username: user.username,
+    id: user._id
+  }
+
+  return jwt.sign(userForToken, config.SECRET)
+}
+
+  module.exports = {listWithOneblog, initialBlogs, blogsInDb, nonExistingId, usersInDb, getToken, getFirstUserInDb}
