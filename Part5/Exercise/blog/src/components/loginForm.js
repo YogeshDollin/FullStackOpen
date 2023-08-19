@@ -10,6 +10,7 @@ const LoginForm = ({setUser}) => {
     const handleLogin = async (evt) => {
         evt.preventDefault()
         const user = await loginService.login({username, password})
+        localStorage.setItem('loggedBlogappUser', user)
         setUser(user)
         setUsername('')
         setPassword('')
