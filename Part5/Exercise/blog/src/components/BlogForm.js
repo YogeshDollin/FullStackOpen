@@ -1,15 +1,30 @@
 import { useState } from "react"
 import blogService from '../services/blogs'
 
-const BlogForm = () => {
+const BlogForm = ({setNotification, blogs, setBlogs}) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
 
     const createBlog = async (evt) => {
         const blog = {title, author, url}
-        const response = await blogService.create(blog)
-        console.log(response)
+        try {
+            const response = await blogService.create(blog)
+            setBlogs(blogs.concat(response))
+            setNotification(`a new blog ${response.title} by ${response.author}`)
+            setTimeout(() => {
+                setNotification('')
+            }, 3000);
+            setTitle('')
+            setAuthor('')
+            setUrl('')
+        } catch (error) {
+            setErrorMessage('Wrong credentials')
+            setTimeout(() => {
+                setErrorMessage('')
+            }, 3000);
+        }
     }
 
     return (

@@ -15,14 +15,17 @@ function App() {
       setUser(loggedUser)
       blogService.setToken(loggedUser.token)
 
-      blogsService.getAll()
+      try {
+        blogsService.getAll()
         .then(result => {
           setBlogs(result)
         })
+      } catch (error) {
+      }
     }
   }, [])
   return (
-    user === null ? <LoginForm setUser={setUser}/> : <Blogs blogs={blogs} user={user.name} setUser={setUser}/>
+    user === null ? <LoginForm setUser={setUser}/> : <Blogs blogs={blogs} user={user.name} callbacks={{setUser, setBlogs}}/>
   )
 }
 

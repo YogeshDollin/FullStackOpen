@@ -1,0 +1,15 @@
+#errorMessage{
+    color: red;
+    background-color: lightgray;
+    border: 2px solid red;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#notification{
+    color: green;
+    background-color: lightgray;
+    border: 2px solid green;
+    padding: 10px;
+    border-radius: 5px;
+}
