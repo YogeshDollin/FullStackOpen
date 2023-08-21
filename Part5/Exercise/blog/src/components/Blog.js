@@ -12,7 +12,7 @@ const Blog = ({blog}) => {
                 <div>
                     {blog.title} <button onClick={toggleShowContent}>hide</button>
                     <br/>
-                    {blog.url}
+                    <a href={blog.url}>{blog.url}</a>
                     <br/>
                     likes {blog.likes}<button>like</button>
                     <br/>
