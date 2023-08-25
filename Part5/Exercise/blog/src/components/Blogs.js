@@ -14,6 +14,7 @@ const Blogs = ({user, setUser}) => {
       try {
         blogsService.getAll()
         .then(result => {
+            result.sort((blog1, blog2) => blog1.likes < blog2.likes)
           setBlogs(result)
         })
       } catch (error) {
