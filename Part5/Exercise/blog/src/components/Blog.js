@@ -1,22 +1,36 @@
 import { useState } from "react"
+import blogService from '../services/blogs'
 
 const Blog = ({blog}) => {
     const [showContent, setShowContent] = useState(false)
+    const [blogState, setBlogState] = useState(blog)
 
     const toggleShowContent = () => {
         setShowContent(!showContent)
     }
+
+    const handleLikeClick = async (evt) => {
+        evt.preventDefault()
+        const updateBlog = {
+            ...blogState,
+            likes: blogState.likes + 1,
+            user: blogState.user.id
+        }
+        const response = await blogService.update(updateBlog.id, updateBlog)
+        setBlogState(response)
+    }
+
     return (
         <div className="blog">
             {showContent ?
                 <div>
-                    {blog.title} <button onClick={toggleShowContent}>hide</button>
+                    {blogState.title} <button onClick={toggleShowContent}>hide</button>
                     <br/>
-                    <a href={blog.url}>{blog.url}</a>
+                    <a href={blogState.url}>{blogState.url}</a>
                     <br/>
-                    likes {blog.likes}<button>like</button>
+                    likes {blogState.likes}<button onClick={handleLikeClick}>like</button>
                     <br/>
-                    {blog.author}
+                    {blogState.author}
                 </div>
                 :
                 <div>{blog.title} {blog.author} <button onClick={toggleShowContent}>view</button></div>
