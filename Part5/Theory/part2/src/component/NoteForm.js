@@ -1,5 +1,4 @@
-import { useState } from "react"
-import noteService from '../services/notes'
+import { useState } from 'react'
 
 const NoteForm = ({createNote}) => {
     const [newNote, setNewNote] = useState('')

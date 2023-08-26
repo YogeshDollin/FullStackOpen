@@ -7,7 +7,7 @@ const Footer = () => {
     return (
         <div style={footerStyle}>
             <br/>
-            <em>Note app, by learner Yogesh Dollin</em>
+            <em>Note app, by Yogesh Dollin</em>
         </div>
     )
 }
