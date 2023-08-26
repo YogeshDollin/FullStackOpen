@@ -1,10 +1,10 @@
-import { useState } from "react"
+import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const BlogForm = ({addBlog}) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
-    
 
     const createBlog = async (evt) => {
         evt.preventDefault()
@@ -32,6 +32,10 @@ const BlogForm = ({addBlog}) => {
             </form>
         </div>
     )
+}
+
+BlogForm.propTypes = {
+    addBlog: PropTypes.string.isRequired
 }
 
 export default BlogForm

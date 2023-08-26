@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 import Blogs from './components/Blogs'
-import LoginForm from "./components/loginForm"
+import LoginForm from './components/loginForm'
 import blogService from './services/blogs'
 
 function App() {
@@ -19,4 +19,4 @@ function App() {
   )
 }
 
-export default App;
+export default App
