@@ -44,6 +44,13 @@ const Blogs = ({user, setUser}) => {
         }
     }
 
+    const removeBlog = async (blog) => {
+        if(window.confirm(`Remove blog ${blog.title} by ${blog.author}`)){
+            blogsService.remove(blog.id)
+            setBlogs(blogs.filter(b => b.id !== blog.id))
+        }
+    }
+
     return (
         <div>
             <h2>Blogs</h2>
@@ -56,7 +63,7 @@ const Blogs = ({user, setUser}) => {
             </Togglable>
             
             <br/>
-            {blogs.map( blog => <Blog key={blog.id} blog={blog}/>)}
+            {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog}/>)}
         </div>
     )
 }
