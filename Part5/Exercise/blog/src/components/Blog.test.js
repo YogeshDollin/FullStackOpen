@@ -2,6 +2,7 @@ import {render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
+import BlogForm from './BlogForm'
 
 test('render blog without details', () => {
     const blog = {
@@ -60,4 +61,24 @@ test('clicking the remove button calls the handler', async () => {
     await user.click(button)
 
     expect(mockhandler.mock.calls).toHaveLength(1)
+})
+
+test('testing the add blog handling', async () => {
+    const mockhandler = jest.fn()
+    const {container} = render(<BlogForm addBlog={mockhandler} />)
+
+    const user = userEvent.setup()
+    const inputTitle = container.querySelector('input[name="title"]')
+    await user.type(inputTitle, 'sample')
+
+    const inputAuthor = container.querySelector('input[name="author"]')
+    await user.type(inputAuthor, 'Anony')
+
+    const inputUrl = container.querySelector('input[name="url"]')
+    await user.type(inputUrl, 'sample.com')
+
+    const submitButton = container.querySelector('button[type="submit"]')
+    await user.click(submitButton)
+
+    expect(mockhandler.mock.calls[0][0]).toEqual({ title: 'sample', author: 'Anony', url: 'sample.com' })
 })
