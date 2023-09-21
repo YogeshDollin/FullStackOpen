@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
-import {render, screen} from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import NoteForm from './NoteForm'
 
 test('<NoteForm /> updates parent state and calls onSubmit', async () => {

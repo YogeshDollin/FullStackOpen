@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
-import { render, screen } from "@testing-library/react"
-import Togglable from "./Togglable"
-import userEvent from "@testing-library/user-event"
+import { render, screen } from '@testing-library/react'
+import Togglable from './Togglable'
+import userEvent from '@testing-library/user-event'
 
 describe('<Togglable />', () => {
     let container
@@ -9,7 +9,7 @@ describe('<Togglable />', () => {
     beforeEach(() => {
         container = render(
         <Togglable buttonLabel='show...'>
-            <div className="testDiv">
+            <div className='testDiv'>
                 togglable Content
             </div>
         </Togglable>).container
