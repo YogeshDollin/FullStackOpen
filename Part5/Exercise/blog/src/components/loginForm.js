@@ -30,13 +30,13 @@ const LoginForm = ({setUser}) => {
             {errorMessage ? <p id='errorMessage'>{errorMessage}</p> : ''}
             <div>
                 username
-                <input type='text' name='username' value={username} onChange={({target}) => {setUsername(target.value)}}/>
+                <input type='text' id='username' name='username' value={username} onChange={({target}) => {setUsername(target.value)}}/>
             </div>
             <div>
                 password
-                <input type='password' name='password' value={password} onChange={({target}) => {setPassword(target.value)}}/>
+                <input type='password' id='password' name='password' value={password} onChange={({target}) => {setPassword(target.value)}}/>
             </div>
-            <button type='submit'>login</button>
+            <button id='login-submit' type='submit'>login</button>
         </form>
     )
 }
