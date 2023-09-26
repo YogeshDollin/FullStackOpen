@@ -44,7 +44,7 @@ describe('Blog app', () => {
         cy.login({username: 'test', password: 'test'})
       })
 
-      it.only('a blog can be created',() => {
+      it('a blog can be created',() => {
         cy.contains('create new note').click()
 
         cy.get('input[name="title"]').type('sample')
@@ -55,6 +55,22 @@ describe('Blog app', () => {
         cy.get('#notification').contains('a new blog sample by anonymous')
         cy.get('.blog')
           .should('contain', 'sample anonymous')
+      })
+      describe.only('when a blog created', () => {
+        beforeEach(() => {
+          cy.createBlog({
+            title: 'sample',
+            author: 'anonymous',
+            url: 'sample.com'
+          })
+          cy.visit('http://localhost:3000')
+        })
+
+        it.only('a blog can be liked', () => {
+          cy.contains('view').click()
+          cy.contains('like').click()
+          cy.contains('likes 1')
+        })
       })
     })
   })
