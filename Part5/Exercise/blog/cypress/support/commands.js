@@ -41,3 +41,7 @@ Cypress.Commands.add('createBlog', (blog) => {
         }
     })
 })
+
+Cypress.Commands.add('clearLoggedUserInfo', () => {
+    localStorage.clear()
+})
