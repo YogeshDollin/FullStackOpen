@@ -66,10 +66,22 @@ describe('Blog app', () => {
           cy.visit('http://localhost:3000')
         })
 
-        it.only('a blog can be liked', () => {
+        it('a blog can be liked', () => {
           cy.contains('view').click()
           cy.contains('like').click()
           cy.contains('likes 1')
+        })
+
+        it.only('a blog can be deleted', () => {
+          cy.contains('sample anonymous')
+            .parent()
+            .contains('view').click()
+
+          cy.contains('sample.com')
+            .parent()
+            .contains('remove').click()
+
+          cy.get('html').should('not.contain', 'sample.com')
         })
       })
     })

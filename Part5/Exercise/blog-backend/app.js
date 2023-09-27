@@ -27,7 +27,6 @@ app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 if(process.env.NODE_ENV === 'test'){
-    console.log('inside test env')
     const testingRouter = require('./controllers/testing')
     app.use('/api/testing', testingRouter)
 }
