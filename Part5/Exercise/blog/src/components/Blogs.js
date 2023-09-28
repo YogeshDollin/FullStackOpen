@@ -57,13 +57,13 @@ const Blogs = ({user, setUser}) => {
             <h2>Blogs</h2>
             {notification ? <p id='notification'>{notification}</p> : ''}
             {errorMessage ? <p id='errorMessage'>{errorMessage}</p> : ''}
-            <p>{user} logged in <button onClick={handleLogout}>logout</button></p>
+            <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
 
             <Togglable buttonLabel='create new note' ref={toggleRef}>
                 <BlogForm addBlog={addBlog}/>
             </Togglable>
             <br/>
-            {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog}/>)}
+            {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={user.username === blog.user.username ? removeBlog : null}/>)}
         </div>
     )
 }

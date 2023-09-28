@@ -37,7 +37,7 @@ const Blog = ({blog, removeBlog}) => {
                     <br/>
                     {blogState.author}
                     <br/>
-                    <button onClick={handleDeleteBlog}>remove</button>
+                    { removeBlog && <button onClick={handleDeleteBlog}>remove</button> }
                 </div>
                 :
                 <div>{blog.title} {blog.author} <button onClick={toggleShowContent}>view</button></div>

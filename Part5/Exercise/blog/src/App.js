@@ -15,7 +15,7 @@ function App() {
     }
   }, [])
   return (
-    user === null ? <LoginForm setUser={setUser}/> : <Blogs user={user.name} setUser={setUser}/>
+    user === null ? <LoginForm setUser={setUser}/> : <Blogs user={user} setUser={setUser}/>
   )
 }
 
