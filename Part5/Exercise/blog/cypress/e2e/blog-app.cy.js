@@ -62,35 +62,13 @@ describe('Blog app', () => {
         cy.get('.blog')
           .should('contain', 'sample anonymous')
       })
-      describe.only('when a blog created', () => {
+      describe('when a blog created', () => {
         beforeEach(() => {
           cy.createBlog({
             title: 'sample',
             author: 'anonymous',
             url: 'sample.com'
           })
-          cy.visit('http://localhost:3000')
-        })
-
-        it('a blog can be liked', () => {
-          cy.contains('view').click()
-          cy.contains('like').click()
-          cy.contains('likes 1')
-        })
-
-        it('a blog can be deleted', () => {
-          cy.contains('sample anonymous')
-            .parent()
-            .contains('view').click()
-
-          cy.contains('sample.com')
-            .parent()
-            .contains('remove').click()
-
-          cy.get('html').should('not.contain', 'sample.com')
-        })
-
-        it.only('only blog creator should see delete button', () => {
           cy.clearLoggedUserInfo()
           cy.login({username: 'test2', password: 'test2'})
           cy.createBlog({
@@ -98,13 +76,62 @@ describe('Blog app', () => {
             author: 'anonymous2',
             url: 'sample2.com'
           })
-          cy.visit('http://localhost:3000/')
+          cy.visit('http://localhost:3000')
+        })
 
+        it('a blog can be liked', () => {
+          cy.contains('sample2 anonymous2')
+            .parent()
+            .contains('view').click()
+          cy.contains('sample2.com')
+            .parent()
+            .contains('like').click()
+          cy.contains('sample2.com')
+            .parent()
+            .contains('likes 1')
+        })
+
+        it('a blog can be deleted', () => {
+          cy.contains('sample2 anonymous2')
+            .parent()
+            .contains('view').click()
+
+          cy.contains('sample2.com')
+            .parent()
+            .contains('remove').click()
+
+          cy.get('html').should('not.contain', 'sample2.com')
+        })
+
+        it('only blog creator should see delete button', () => {
           cy.contains('sample anonymous')
             .parent()
             .contains('view').click()
 
           cy.contains('sample.com').parent().should('not.contain', 'remove')
+        })
+
+        it('blogs are ordered according to likes', () => {
+          cy.contains('sample2 anonymous2')
+            .parent()
+            .contains('view')
+            .click()
+
+          cy.contains('sample2.com')
+            .parent()
+            .contains('like')
+            .click()
+
+          cy.wait(500,{log: false})
+
+          cy.visit('http://localhost:3000/')
+          cy.get('.blog')
+            .eq(0)
+            .should('contain', 'sample2 anonymous2')
+
+          cy.get('.blog')
+            .eq(1)
+            .should('contain', 'sample anonymous')
         })
       })
     })
