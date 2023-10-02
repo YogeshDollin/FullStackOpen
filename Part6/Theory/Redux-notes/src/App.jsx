@@ -1,21 +1,6 @@
 import {createStore} from 'redux'
+import noteReducer from './reducers/noteReducer'
 
-const noteReducer = (state = [], action) => {
-  switch (action.type) {
-    case 'NEW_NOTE':
-      return state.concat(action.payload)
-    case 'TOGGLE_IMPORTANCE':
-      return state.map(note => {
-        let newNote = note
-        if(note.id === action.payload.id){
-          newNote.important = !note.important
-        }
-        return newNote
-      })
-    default:
-      return state
-  }
-}
 const store = createStore(noteReducer)
 store.dispatch({
   type: 'NEW_NOTE',
@@ -42,12 +27,44 @@ store.dispatch({
   }
 })
 
+const generateId = () => {
+  return Number((Math.random() * 1000000).toFixed(0))
+}
+
 function App() {
+
+  const addNote = (event) => {
+    event.preventDefault();
+    const content = event.target.note.value
+    event.target.note.value = ''
+    store.dispatch({
+      type: 'NEW_NOTE',
+      payload: {
+        content: content,
+        important: false,
+        id: generateId()
+      }
+    })
+    console.log(store.getState())
+  }  
+
+  const toggleImportance = (id) => {
+    store.dispatch({
+      type: 'TOGGLE_IMPORTANCE',
+      payload: {
+        id
+      }
+    })
+  }
   return (
     <>
+    <form onSubmit={addNote}>
+      <input type='text' name='note'/>
+      <button type='submit'>add</button>
+    </form>
       <ul>
         {store.getState().map(note => 
-          <li key={note.id}>
+          <li key={note.id} onClick={() => {toggleImportance(note.id)}}>
             {note.content} <strong>{note.important? 'important' : ''}</strong>
           </li>)}
       </ul>
