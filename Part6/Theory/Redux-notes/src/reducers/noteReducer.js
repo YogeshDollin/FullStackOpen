@@ -1,4 +1,17 @@
-const noteReducer = (state = [], action) => {
+const initialState = [
+    {
+      content: 'reducer defines how redux store works',
+      important: true,
+      id: 1
+    },
+    {
+      content: 'state of store can contain any data',
+      important: false,
+      id: 2
+    }
+  ]
+
+const noteReducer = (state = initialState, action) => {
   console.log(action.type)
   switch (action.type) {
     case 'NEW_NOTE':
@@ -39,5 +52,6 @@ export const toggleImportanceOf = id => {
     }
   }
 }
+
   
 export default noteReducer
