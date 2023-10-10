@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from "react-redux"
-import { voteAction } from "../reducers/anecdoteReducer"
+import { voteAnecdote } from "../reducers/anecdoteReducer"
 
 const AnecdoteList = () => {
 
     const anecdotes = useSelector(state => {
-      const sortedAnecdotes = state.anecdotes.sort((anecdote1, anecdote2) => anecdote1.votes < anecdote2.votes)
+      const sortedAnecdotes = [...state.anecdotes].sort((anecdote1, anecdote2) => anecdote1.votes < anecdote2.votes)
       return state.filter === ''
       ? sortedAnecdotes
       : sortedAnecdotes.filter(anecdote => anecdote.content.includes(state.filter))
@@ -12,7 +12,7 @@ const AnecdoteList = () => {
     const dispatch = useDispatch()
 
     const vote = (id) => {
-        dispatch(voteAction(id))
+        dispatch(voteAnecdote(id))
     }
     return (
         <>
