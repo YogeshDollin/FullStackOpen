@@ -19,7 +19,6 @@ const Notes = () => {
         ? state.notes.filter(note => note.important)
         : state.notes.filter(note => !note.important)
     })
-
     return (
         <ul>
             { notes.map(note => <Note key={note.id} note={note} handleClick={() => dispatch(toggleImportanceOf(note.id))}/>)}

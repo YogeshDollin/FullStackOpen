@@ -26,12 +26,13 @@ const noteSlice = createSlice({
       })
     },
     toggleImportanceOf(state, action){
+      console.log(JSON.parse(JSON.stringify(state)))
       return state.map(note => {
         const newNote = {...note}
-        if(note.id === action.payload.id){
+        if(note.id === action.payload){
           newNote.important = !newNote.important
         }
-        newNote
+        return newNote
       })
     }
   }

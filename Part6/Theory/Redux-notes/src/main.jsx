@@ -8,7 +8,7 @@ import App from './App'
 import noteReducer, { createNote } from './reducers/noteReducer'
 import filterReducer, { filterChange } from './reducers/filterReducer'
 
-const store = createStore({
+const store = configureStore({
   reducer: {
     notes: noteReducer,
     filter: filterReducer
