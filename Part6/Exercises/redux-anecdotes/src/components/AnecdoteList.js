@@ -17,8 +17,8 @@ const AnecdoteList = () => {
     : sortedAnecdotes.filter(anecdote => anecdote.content.includes(state.filter))
   })
 
-  const vote = (id) => {
-      dispatch(voteAnecdote(id))
+  const vote = (anecdote) => {
+      dispatch(voteAnecdote(anecdote))
   }
   return (
       <>
@@ -30,7 +30,7 @@ const AnecdoteList = () => {
             <div>
               has {anecdote.votes}
               <button onClick={() => {
-                vote(anecdote.id)
+                vote(anecdote)
                 dispatch(updateNotificationMessage(`you voted '${anecdote.content}'`))
                 setTimeout(() => {
                   dispatch(removeNotification())
