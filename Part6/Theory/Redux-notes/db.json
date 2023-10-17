@@ -14,6 +14,16 @@
       "content": "adding note to db.json",
       "important": false,
       "id": 3
+    },
+    {
+      "content": "This note is being added with thunk library used in behind the scenes",
+      "important": false,
+      "id": 4
+    },
+    {
+      "content": "Trying one more time to add note with thunk library",
+      "important": true,
+      "id": 5
     }
   ]
 }
