@@ -19,6 +19,16 @@
       "content": "adding note to db.json",
       "important": true,
       "id": 4
+    },
+    {
+      "content": "notes app by yogehs",
+      "important": true,
+      "id": 5
+    },
+    {
+      "content": "Hello World",
+      "important": false,
+      "id": 6
     }
   ]
 }
