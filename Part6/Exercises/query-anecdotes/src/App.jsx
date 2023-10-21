@@ -1,7 +1,7 @@
 import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 import { useQuery } from '@tanstack/react-query'
-import { getAll } from './request'
+import {getAll} from './request'
 
 const App = () => {
 
@@ -20,7 +20,7 @@ const App = () => {
   }
 
 
-  const anecdotes = result.data
+  const anecdotes = result.data ? result.data : []
 
   return (
     <div>
