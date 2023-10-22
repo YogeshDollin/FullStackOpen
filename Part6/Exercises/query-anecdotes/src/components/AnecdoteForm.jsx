@@ -9,6 +9,16 @@ const AnecdoteForm = () => {
     onSuccess: (newAnecdote) => {
       const anecdotes = queryClient.getQueryData(['anecdotes'])
       queryClient.setQueryData(['anecdotes'], anecdotes.concat(newAnecdote))
+      dispatch({type: 'CREATE', payload: newAnecdote})
+      setTimeout(() => {
+        dispatch({type: 'RESET'})
+      }, 5000);
+    },
+    onError: (err) => {
+      dispatch({type: 'ERROR', payload: err.response.data.error})
+      setTimeout(() => {
+        dispatch({type: 'RESET'})
+      }, 5000);
     }
   })
 
@@ -21,11 +31,6 @@ const AnecdoteForm = () => {
     newAnecdoteMutation.mutate(newAnecdote)
     event.target.anecdote.value = ''
     console.log('new anecdote')
-
-    dispatch({type: 'CREATE', payload: newAnecdote})
-    setTimeout(() => {
-      dispatch({type: 'RESET'})
-    }, 5000);
 }
 
   return (
