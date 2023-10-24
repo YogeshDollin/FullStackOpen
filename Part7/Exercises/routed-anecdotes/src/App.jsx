@@ -76,21 +76,23 @@ const CreateNew = (props) => {
     })
   }
 
+  const excludeReset = ({reset, ...rest}) => rest
+
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' {...content} />
+          <input name='content' {...excludeReset(content)} />
         </div>
         <div>
           author
-          <input name='author' {...author} />
+          <input name='author' {...excludeReset(author)} />
         </div>
         <div>
           url for more info
-          <input name='info' {...info} />
+          <input name='info' {...excludeReset(info)} />
         </div>
         <button>create</button>
         <button onClick={((e) => {
