@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({blog, removeBlog}) => {
+const Blog = ({blog, removeBlog, likeBlog}) => {
     const [showContent, setShowContent] = useState(false)
-    const [blogState, setBlogState] = useState(blog)
 
     const toggleShowContent = () => {
         setShowContent(!showContent)
@@ -11,31 +10,25 @@ const Blog = ({blog, removeBlog}) => {
 
     const handleLikeClick = async (evt) => {
         evt.preventDefault()
-        const updateBlog = {
-            ...blogState,
-            likes: blogState.likes + 1,
-            user: blogState.user.id
-        }
-        const response = await blogService.update(updateBlog.id, updateBlog)
-        setBlogState(response)
+        likeBlog(blog)
     }
 
     const handleDeleteBlog = async (evt) => {
         evt.preventDefault()
-        await removeBlog(blogState)
+        await removeBlog(blog)
     }
 
     return (
         <div className="blog">
             {showContent ?
                 <div>
-                    {blogState.title} <button onClick={toggleShowContent}>hide</button>
+                    {blog.title} <button onClick={toggleShowContent}>hide</button>
                     <br/>
-                    <a href={blogState.url}>{blogState.url}</a>
+                    <a href={blog.url}>{blog.url}</a>
                     <br/>
-                    likes {blogState.likes}<button onClick={handleLikeClick}>like</button>
+                    likes {blog.likes}<button onClick={handleLikeClick}>like</button>
                     <br/>
-                    {blogState.author}
+                    {blog.author}
                     <br/>
                     { removeBlog && <button onClick={handleDeleteBlog}>remove</button> }
                 </div>

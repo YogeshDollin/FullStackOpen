@@ -6,7 +6,7 @@ import Togglable from './Togglable'
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotification, resetNotification } from '../store/notificationReducer'
 import { setErrorMessage, resetErrorMessage } from '../store/errorMessageReducer'
-import { setBlogs, appendBlog, deleteBlog } from '../store/blogReducer'
+import { setBlogs, appendBlog, deleteBlog, updateBlog } from '../store/blogReducer'
 
 const Blogs = ({user, setUser}) => {
     const dispatch = useDispatch()
@@ -14,7 +14,6 @@ const Blogs = ({user, setUser}) => {
     const notification = useSelector(state => state.notification)
     const errorMessage = useSelector(state => state.errorMessage)
     const toggleRef = useRef()
-
     useEffect(() => {
       try {
         blogsService.getAll()
@@ -32,21 +31,29 @@ const Blogs = ({user, setUser}) => {
         setUser(null)
     }
 
+    const notifyWith = (message, type='info') => {
+        if(type === 'info'){
+            dispatch(setNotification(message))
+            setTimeout(() => {
+                dispatch(resetNotification())
+            }, 3000)
+        }else{
+            dispatch(setErrorMessage(message))
+            setTimeout(() => {
+                dispatch(resetErrorMessage())
+            }, 3000)
+        }
+    }
+
     const addBlog = async (blog) => {
         try {
             const response = await blogsService.create(blog)
             dispatch(appendBlog(response))
-            dispatch(setNotification(`a new blog ${response.title} by ${response.author}`))
-            setTimeout(() => {
-                dispatch(resetNotification())
-            }, 3000)
+            notifyWith(`a new blog ${response.title} by ${response.author}`)
             toggleRef.current.toggleVisibility()
         } catch (error) {
-            dispatch(setErrorMessage('Failed to create blog'))
             console.log(error)
-            setTimeout(() => {
-                dispatch(resetErrorMessage())
-            }, 3000)
+            notifyWith('Failed to create blog', 'error')
         }
     }
 
@@ -55,6 +62,17 @@ const Blogs = ({user, setUser}) => {
             blogsService.remove(blog.id)
             dispatch(deleteBlog(blog))
         }
+    }
+
+    const likeBlog = async (blog) => {
+        const updatedBlog = {
+            ...blog,
+            likes: blog.likes + 1,
+            user: blog.user.id
+        }
+        const response = await blogsService.update(updatedBlog.id, updatedBlog)
+        dispatch(updateBlog(response))
+        notifyWith(`A like for the blog '${blog.title}' by '${blog.author}'`)
     }
 
     return (
@@ -68,7 +86,7 @@ const Blogs = ({user, setUser}) => {
                 <BlogForm addBlog={addBlog}/>
             </Togglable>
             <br/>
-            {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={user.username === blog.user.username ? removeBlog : null}/>)}
+            {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={user.username === blog.user.username ? removeBlog : null} likeBlog={likeBlog}/>)}
         </div>
     )
 }
