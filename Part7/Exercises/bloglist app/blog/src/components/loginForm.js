@@ -2,11 +2,14 @@ import { useState } from 'react'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { resetErrorMessage, setErrorMessage } from '../store/errorMessageReducer'
 
 const LoginForm = ({setUser}) => {
+    const dispatch = useDispatch()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [errorMessage, setErrorMessage] = useState('')
+    const errorMessage= useSelector(state => state.errorMessage)
 
     const handleLogin = async (evt) => {
         evt.preventDefault()
@@ -18,9 +21,9 @@ const LoginForm = ({setUser}) => {
             setUsername('')
             setPassword('')
         } catch (error) {
-            setErrorMessage('Wrong credentials')
+            dispatch(setErrorMessage('Wrong credentials'))
             setTimeout(() => {
-                setErrorMessage('')
+                dispatch(resetErrorMessage())
             }, 3000)
         }
     }

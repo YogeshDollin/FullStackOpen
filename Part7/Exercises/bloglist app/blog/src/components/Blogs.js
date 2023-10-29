@@ -3,11 +3,15 @@ import Blog from './Blog'
 import BlogForm from './BlogForm'
 import blogsService from '../services/blogs'
 import Togglable from './Togglable'
+import { useSelector, useDispatch } from 'react-redux'
+import { setNotification, resetNotification } from '../store/notificationReducer'
+import { setErrorMessage, resetErrorMessage } from '../store/errorMessageReducer'
 
 const Blogs = ({user, setUser}) => {
+    const dispatch = useDispatch()
     const [blogs, setBlogs] = useState([])
-    const [notification, setNotification] = useState('')
-    const [errorMessage, setErrorMessage] = useState('')
+    const notification = useSelector(state => state.notification)
+    const errorMessage = useSelector(state => state.errorMessage)
     const toggleRef = useRef()
 
     useEffect(() => {
@@ -31,16 +35,16 @@ const Blogs = ({user, setUser}) => {
         try {
             const response = await blogsService.create(blog)
             setBlogs(blogs.concat(response))
-            setNotification(`a new blog ${response.title} by ${response.author}`)
+            dispatch(setNotification(`a new blog ${response.title} by ${response.author}`))
             setTimeout(() => {
-                setNotification('')
+                dispatch(resetNotification())
             }, 3000)
             toggleRef.current.toggleVisibility()
         } catch (error) {
-            setErrorMessage('Failed to create blog')
+            dispatch(setErrorMessage('Failed to create blog'))
             console.log(error)
             setTimeout(() => {
-                setErrorMessage('')
+                dispatch(resetErrorMessage())
             }, 3000)
         }
     }
