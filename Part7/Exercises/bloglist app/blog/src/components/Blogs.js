@@ -7,13 +7,15 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setNotification, resetNotification } from '../store/notificationReducer'
 import { setErrorMessage, resetErrorMessage } from '../store/errorMessageReducer'
 import { setBlogs, appendBlog, deleteBlog, updateBlog } from '../store/blogReducer'
+import { resetUser } from '../store/userReducer'
 
-const Blogs = ({user, setUser}) => {
+const Blogs = () => {
     const dispatch = useDispatch()
     const blogs = useSelector(state => state.blogs)
     const notification = useSelector(state => state.notification)
     const errorMessage = useSelector(state => state.errorMessage)
     const toggleRef = useRef()
+    const user = useSelector(state => state.user)
     useEffect(() => {
       try {
         blogsService.getAll()
@@ -28,7 +30,7 @@ const Blogs = ({user, setUser}) => {
 
     const handleLogout = () => {
         localStorage.removeItem('loggedBlogappUser')
-        setUser(null)
+        dispatch(resetUser())
     }
 
     const notifyWith = (message, type='info') => {
