@@ -5,30 +5,37 @@ import blogsService from '../services/blogs'
 import Togglable from './Togglable'
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotificationAction, resetNotificationAction } from '../store/notificationReducer'
-import { setBlogs, appendBlog, deleteBlog, updateBlog } from '../store/blogReducer'
+import { deleteBlog, updateBlog } from '../store/blogReducer'
 import { resetUser } from '../store/userReducer'
 import AppContext from '../context/appContext'
 import Notification from './Notification'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const Blogs = () => {
     const dispatch = useDispatch()
-    const blogs = useSelector(state => state.blogs)
-    // const notification = useSelector(state => state.notification)
-    // const errorMessage = useSelector(state => state.errorMessage)
+    const queryClient = useQueryClient()
+    const result = useQuery({
+        queryKey: ['blogs'],
+        queryFn: () => blogsService.getAll().then(res => res.sort((b1, b2) => b1.likes < b2.likes)),
+        onError: (err) => {console.log(err)}
+    })
+
+    const newBlogMutation = useMutation({
+        mutationFn: blogsService.create,
+        onSuccess: (newBlog) => {
+            const blogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+            notifyWith(`a new blog ${newBlog.title} by ${newBlog.author}`)
+        }
+    })
     const [notification, notificationDispatch] = useContext(AppContext)
     const toggleRef = useRef()
     const user = useSelector(state => state.user)
-    useEffect(() => {
-      try {
-        blogsService.getAll()
-        .then(result => {
-            result.sort((blog1, blog2) => blog1.likes < blog2.likes)
-          dispatch(setBlogs(result))
-        })
-      } catch (error) {
-        console.log(error)
-      }
-    }, [])
+
+    if(result.isLoading){
+        return <p>loading data...</p>
+    }
+    const blogs = result.data
 
     const handleLogout = () => {
         localStorage.removeItem('loggedBlogappUser')
@@ -44,9 +51,7 @@ const Blogs = () => {
 
     const addBlog = async (blog) => {
         try {
-            const response = await blogsService.create(blog)
-            dispatch(appendBlog(response))
-            notifyWith(`a new blog ${response.title} by ${response.author}`)
+            newBlogMutation.mutate(blog)
             toggleRef.current.toggleVisibility()
         } catch (error) {
             console.log(error)
