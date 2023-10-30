@@ -6,7 +6,6 @@ import userReducer from './userReducer'
 
 const store = configureStore({
     reducer: {
-        notification: notificationReducer,
         errorMessage: errorMessageReducer,
         blogs: blogReducer,
         user: userReducer

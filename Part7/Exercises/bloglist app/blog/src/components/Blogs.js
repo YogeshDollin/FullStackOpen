@@ -1,19 +1,21 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Blog from './Blog'
 import BlogForm from './BlogForm'
 import blogsService from '../services/blogs'
 import Togglable from './Togglable'
 import { useSelector, useDispatch } from 'react-redux'
-import { setNotification, resetNotification } from '../store/notificationReducer'
-import { setErrorMessage, resetErrorMessage } from '../store/errorMessageReducer'
+import { setNotificationAction, resetNotificationAction } from '../store/notificationReducer'
 import { setBlogs, appendBlog, deleteBlog, updateBlog } from '../store/blogReducer'
 import { resetUser } from '../store/userReducer'
+import AppContext from '../context/appContext'
+import Notification from './Notification'
 
 const Blogs = () => {
     const dispatch = useDispatch()
     const blogs = useSelector(state => state.blogs)
-    const notification = useSelector(state => state.notification)
-    const errorMessage = useSelector(state => state.errorMessage)
+    // const notification = useSelector(state => state.notification)
+    // const errorMessage = useSelector(state => state.errorMessage)
+    const [notification, notificationDispatch] = useContext(AppContext)
     const toggleRef = useRef()
     const user = useSelector(state => state.user)
     useEffect(() => {
@@ -34,17 +36,10 @@ const Blogs = () => {
     }
 
     const notifyWith = (message, type='info') => {
-        if(type === 'info'){
-            dispatch(setNotification(message))
-            setTimeout(() => {
-                dispatch(resetNotification())
-            }, 3000)
-        }else{
-            dispatch(setErrorMessage(message))
-            setTimeout(() => {
-                dispatch(resetErrorMessage())
-            }, 3000)
-        }
+        notificationDispatch(setNotificationAction({type, message}))
+        setTimeout(() => {
+            notificationDispatch(resetNotificationAction())
+        }, 3000)
     }
 
     const addBlog = async (blog) => {
@@ -80,8 +75,7 @@ const Blogs = () => {
     return (
         <div>
             <h2>Blogs</h2>
-            {notification ? <p id='notification'>{notification}</p> : ''}
-            {errorMessage ? <p id='errorMessage'>{errorMessage}</p> : ''}
+            <Notification type={notification.type} message={notification.message}/>
             <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
 
             <Togglable buttonLabel='create new note' ref={toggleRef}>

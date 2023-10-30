@@ -1,16 +1,17 @@
-import { useState } from 'react'
+import { useContext, useReducer, useState } from 'react'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
-import { resetErrorMessage, setErrorMessage } from '../store/errorMessageReducer'
+import { useDispatch } from 'react-redux'
+import AppContext from '../context/appContext'
+import Notification from './Notification'
+import { resetNotificationAction, setNotificationAction } from '../store/notificationReducer'
 
 const LoginForm = ({setUser}) => {
     const dispatch = useDispatch()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const errorMessage= useSelector(state => state.errorMessage)
-
+    const [notification, notificationDispatch] = useContext(AppContext)
     const handleLogin = async (evt) => {
         evt.preventDefault()
         try {
@@ -21,16 +22,16 @@ const LoginForm = ({setUser}) => {
             setUsername('')
             setPassword('')
         } catch (error) {
-            dispatch(setErrorMessage('Wrong credentials'))
+            notificationDispatch(setNotificationAction({type: 'error', message: 'Wrong credentials'}))
             setTimeout(() => {
-                dispatch(resetErrorMessage())
+                notificationDispatch(resetNotificationAction())
             }, 3000)
         }
     }
     return (
         <form onSubmit={handleLogin}>
             <h2>log in to application</h2>
-            {errorMessage ? <p id='errorMessage'>{errorMessage}</p> : ''}
+            <Notification type={notification.type} message={notification.message}/>
             <div>
                 username
                 <input type='text' id='username' name='username' value={username} onChange={({target}) => {setUsername(target.value)}}/>
