@@ -28,6 +28,34 @@ const Blogs = () => {
             notifyWith(`a new blog ${newBlog.title} by ${newBlog.author}`)
         }
     })
+    const updateBlogMutation = useMutation({
+        mutationFn: blogsService.update,
+        onSuccess: (updatedBlog) => {
+            const fetchedBlogs = queryClient.getQueryData(['blogs'])
+            const updatedBlogs = []
+            fetchedBlogs.forEach(blog => {
+                if(blog.id === updatedBlog.id){
+                    updatedBlogs.push(updatedBlog)
+                }else{
+                    updatedBlogs.push(blog)
+                }
+            })
+            queryClient.setQueryData(['blogs'], updatedBlogs)
+        },
+        onError: (err) => {
+            console.log(err)
+        }
+    })
+    const removeBlogMutation = useMutation({
+        mutationFn: blogsService.remove,
+        onSuccess: (response, id) => {
+            const fetchedBlogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(['blogs'], fetchedBlogs.filter( blog => blog.id !== id) )
+        },
+        onError: (err) => {
+            console.log(err)
+        }
+    })
     const [notification, notificationDispatch] = useContext(AppContext)
     const toggleRef = useRef()
     const user = useSelector(state => state.user)
@@ -61,8 +89,9 @@ const Blogs = () => {
 
     const removeBlog = async (blog) => {
         if(window.confirm(`Remove blog ${blog.title} by ${blog.author}`)){
-            blogsService.remove(blog.id)
-            dispatch(deleteBlog(blog))
+            // blogsService.remove(blog.id)
+            // dispatch(deleteBlog(blog))
+            removeBlogMutation.mutate(blog.id)
         }
     }
 
@@ -72,9 +101,7 @@ const Blogs = () => {
             likes: blog.likes + 1,
             user: blog.user.id
         }
-        const response = await blogsService.update(updatedBlog.id, updatedBlog)
-        dispatch(updateBlog(response))
-        notifyWith(`A like for the blog '${blog.title}' by '${blog.author}'`)
+        updateBlogMutation.mutate(updatedBlog)
     }
 
     return (
