@@ -1,14 +1,11 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useRef, useContext } from 'react'
 import Blog from './Blog'
 import BlogForm from './BlogForm'
 import blogsService from '../services/blogs'
 import Togglable from './Togglable'
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotificationAction, resetNotificationAction } from '../store/notificationReducer'
-import { deleteBlog, updateBlog } from '../store/blogReducer'
-import { resetUser } from '../store/userReducer'
 import AppContext from '../context/appContext'
-import Notification from './Notification'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const Blogs = () => {
@@ -24,8 +21,16 @@ const Blogs = () => {
         mutationFn: blogsService.create,
         onSuccess: (newBlog) => {
             const blogs = queryClient.getQueryData(['blogs'])
-            queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+            const appendedBlogs = []
+            blogs.forEach(blog => {
+                appendedBlogs.push(blog)  
+            })
+            appendedBlogs.push(newBlog)
+            queryClient.setQueryData(['blogs'], appendedBlogs)
             notifyWith(`a new blog ${newBlog.title} by ${newBlog.author}`)
+        },
+        onError: (err) => {
+            console.log(err)
         }
     })
     const updateBlogMutation = useMutation({
@@ -56,19 +61,15 @@ const Blogs = () => {
             console.log(err)
         }
     })
-    const [notification, notificationDispatch] = useContext(AppContext)
+
     const toggleRef = useRef()
     const user = useSelector(state => state.user)
+    const [notification, notificationDispatch] = useContext(AppContext)
 
     if(result.isLoading){
         return <p>loading data...</p>
     }
     const blogs = result.data
-
-    const handleLogout = () => {
-        localStorage.removeItem('loggedBlogappUser')
-        dispatch(resetUser())
-    }
 
     const notifyWith = (message, type='info') => {
         notificationDispatch(setNotificationAction({type, message}))
@@ -106,10 +107,6 @@ const Blogs = () => {
 
     return (
         <div>
-            <h2>Blogs</h2>
-            <Notification type={notification.type} message={notification.message}/>
-            <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-
             <Togglable buttonLabel='create new note' ref={toggleRef}>
                 <BlogForm addBlog={addBlog}/>
             </Togglable>

@@ -7,6 +7,7 @@ import { setUser } from './store/userReducer'
 import notificationReducer from './store/notificationReducer'
 import AppContext from './context/appContext'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import Header from './components/Header'
 
 function App() {
   const dispatch = useDispatch()
@@ -23,7 +24,12 @@ function App() {
   }, [])
   return (
     <AppContext.Provider value={[notification, notificationDispatch]}>
-      {user === null ? <LoginForm setUser={setUser}/> : <QueryClientProvider client={new QueryClient()}><Blogs/></QueryClientProvider>}
+      {user === null ? <LoginForm setUser={setUser}/> : <>
+        <Header/>
+        <QueryClientProvider client={new QueryClient()}>
+          <Blogs/>
+        </QueryClientProvider>
+      </>}
     </AppContext.Provider>
   )
 }

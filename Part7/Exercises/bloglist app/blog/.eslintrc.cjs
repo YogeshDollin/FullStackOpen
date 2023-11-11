@@ -29,7 +29,6 @@ module.exports ={
             'error',
             'never'
         ],
-        'no-trailing-spaces': 'error',
         'no-console': 0,
         'react/prop-types': 0,
         'no-unused-vars': 0
