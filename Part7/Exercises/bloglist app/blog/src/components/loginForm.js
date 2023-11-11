@@ -6,6 +6,9 @@ import { useDispatch } from 'react-redux'
 import AppContext from '../context/appContext'
 import Notification from './Notification'
 import { resetNotificationAction, setNotificationAction } from '../store/notificationReducer'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import Alert from 'react-bootstrap/Alert'
 
 const LoginForm = ({setUser}) => {
     const dispatch = useDispatch()
@@ -29,19 +32,21 @@ const LoginForm = ({setUser}) => {
         }
     }
     return (
-        <form onSubmit={handleLogin}>
+        <div className='container'>
             <h2>log in to application</h2>
-            <Notification type={notification.type} message={notification.message}/>
-            <div>
-                username
-                <input type='text' id='username' name='username' value={username} onChange={({target}) => {setUsername(target.value)}}/>
-            </div>
-            <div>
-                password
-                <input type='password' id='password' name='password' value={password} onChange={({target}) => {setPassword(target.value)}}/>
-            </div>
-            <button id='login-submit' type='submit'>login</button>
-        </form>
+            <Notification variant='danger' message={notification.message}/>
+            <Form onSubmit={handleLogin}>
+                <Form.Group>
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control type='text' id='username' name='username' value={username} onChange={({target}) => {setUsername(target.value)}}/>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control type='password' id='password' name='password' value={password} onChange={({target}) => {setPassword(target.value)}}/>
+                </Form.Group>
+            <Button variant='primary' id='login-submit' type='submit'>Login</Button>
+        </Form>
+        </div>
     )
 }
 

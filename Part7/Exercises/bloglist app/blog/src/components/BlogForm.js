@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
 
 const BlogForm = ({addBlog}) => {
     const [title, setTitle] = useState('')
@@ -18,21 +20,21 @@ const BlogForm = ({addBlog}) => {
     return (
         <div>
             <h2>Create new</h2>
-            <form onSubmit={createBlog}>
-                <div>
-                    title:
-                    <input type="text" name="title" value={title} onChange={({target}) => setTitle(target.value)} />
-                </div>
-                <div>
-                    author:
-                    <input type="text" name="author" value={author} onChange={({target}) => setAuthor(target.value)} />
-                </div>
-                <div>
-                    url:
-                    <input type="text" name="url" value={url} onChange={({target}) => setUrl(target.value)} />
-                </div>
-                <button type="submit">create</button>
-            </form>
+            <Form onSubmit={createBlog}>
+                <Form.Group >
+                    <Form.Label >Title: </Form.Label>
+                    <Form.Control type="text" name="title" value={title} onChange={({target}) => setTitle(target.value)} />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Author: </Form.Label>
+                    <Form.Control type="text" name="author" value={author} onChange={({target}) => setAuthor(target.value)} />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Url: </Form.Label>
+                    <Form.Control type="text" name="url" value={url} onChange={({target}) => setUrl(target.value)} />
+                </Form.Group>
+                <Button className='mt-3 mb-3' variant='success' type="submit">create</Button>
+            </Form>
         </div>
     )
 }

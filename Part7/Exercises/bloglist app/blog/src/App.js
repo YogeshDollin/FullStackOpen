@@ -4,10 +4,10 @@ import LoginForm from './components/loginForm'
 import blogsService from './services/blogs'
 import { useDispatch, useSelector } from 'react-redux'
 import { setUser } from './store/userReducer'
-import notificationReducer from './store/notificationReducer'
+import notificationReducer, {setNotificationAction, resetNotificationAction} from './store/notificationReducer'
 import AppContext from './context/appContext'
 import Header from './components/Header'
-import { Route, Routes, useMatch } from 'react-router-dom'
+import { Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import Users from './components/Users'
 import User from './components/User'
 import userService from './services/users'
@@ -19,6 +19,8 @@ function App() {
   const user = useSelector(state => state.user)
   const [notification, notificationDispatch] = useReducer(notificationReducer, '')
   const [users, setUsers] = useState([])
+  
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
   const result = useQuery({
@@ -27,6 +29,13 @@ function App() {
       onError: (err) => {console.log(err)},
       enabled: !!user
   })
+
+  const notifyWith = (message, type='success') => {
+    notificationDispatch(setNotificationAction({type, message}))
+    setTimeout(() => {
+        notificationDispatch(resetNotificationAction())
+    }, 3000)
+  }
 
   const updateBlogMutation = useMutation({
     mutationFn: blogsService.update,
@@ -41,9 +50,11 @@ function App() {
             }
         })
         queryClient.setQueryData(['blogs'], updatedBlogs)
+        notifyWith(`liked this '${updatedBlog.title}' blog`)
     },
     onError: (err) => {
-        console.log(err)
+      console.log(err)
+      notifyWith(err.message, 'danger')
     }
   })
   const removeBlogMutation = useMutation({
@@ -51,9 +62,11 @@ function App() {
       onSuccess: (response, id) => {
           const fetchedBlogs = queryClient.getQueryData(['blogs'])
           queryClient.setQueryData(['blogs'], fetchedBlogs.filter( blog => blog.id !== id) )
+          notifyWith('blog deleted successfully')
       },
       onError: (err) => {
           console.log(err)
+          notifyWith(err.message, 'danger')
       }
   })
 
@@ -91,6 +104,7 @@ function App() {
         // blogsService.remove(blog.id)
         // dispatch(deleteBlog(blog))
         removeBlogMutation.mutate(blog.id)
+        navigate('/blogs')
     }
 }
 

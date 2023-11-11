@@ -1,9 +1,11 @@
-const Notification = ({type, message}) => {
+import Alert from 'react-bootstrap/Alert'
+
+const Notification = ({variant, message}) => {
     if(!message){
         return null
     }
     return (
-        <p className={`notification ${type}`}>{message}</p>
+        <Alert variant={variant}>{message}</Alert>
     )
 }
 

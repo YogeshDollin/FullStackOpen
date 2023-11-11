@@ -3,7 +3,10 @@ import AppContext from '../context/appContext'
 import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { resetUser } from '../store/userReducer'
-import { Link } from 'react-router-dom'
+import Button from 'react-bootstrap/Button'
+import Container from 'react-bootstrap/Container'
+import Nav from 'react-bootstrap/Nav'
+import Navbar from 'react-bootstrap/Navbar'
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -16,15 +19,21 @@ const Header = () => {
     }
     return (
         <div className='header'>
-            <div className='header-top-section'>
-                <Link to='/blogs'>blogs</Link>
-                <Link to='/users'>users</Link>
-                {user.name} logged in <button onClick={handleLogout}>logout</button>
-            </div>
+            <Navbar bg='dark' expand='sm' data-bs-theme='dark'>
+                <Container>
+                    <Navbar.Brand href='/'>BlogApp</Navbar.Brand>
+                    <Nav variant='underline' className='me-auto'>
+                        <Nav.Link href='/blogs'>Blogs</Nav.Link>
+                        <Nav.Link href='/users'>Users</Nav.Link>
+                    </Nav>
+                    <Navbar.Text className='navbar-text'>{user.name} logged in <Button variant='primary' onClick={handleLogout}>logout</Button></Navbar.Text>
+                </Container>
+            </Navbar>
             
             <br/>
-            <h2>Blogs</h2>
-            <Notification type={notification.type} message={notification.message}/>
+            <div className='container'>
+                <Notification type={notification.type} message={notification.message}/>
+            </div>
         </div>
     )
 }

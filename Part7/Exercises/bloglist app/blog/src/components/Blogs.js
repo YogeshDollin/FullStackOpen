@@ -5,8 +5,8 @@ import Togglable from './Togglable'
 import { setNotificationAction, resetNotificationAction } from '../store/notificationReducer'
 import AppContext from '../context/appContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
 import { Link } from 'react-router-dom'
+import ListGroup from 'react-bootstrap/ListGroup'
 
 const Blogs = () => {
     const queryClient = useQueryClient()
@@ -25,6 +25,7 @@ const Blogs = () => {
         },
         onError: (err) => {
             console.log(err)
+            notifyWith(err.message, 'danger')
         }
     })
     
@@ -33,7 +34,7 @@ const Blogs = () => {
     
     const blogs = queryClient.getQueryData(['blogs'])
 
-    const notifyWith = (message, type='info') => {
+    const notifyWith = (message, type='success') => {
         notificationDispatch(setNotificationAction({type, message}))
         setTimeout(() => {
             notificationDispatch(resetNotificationAction())
@@ -51,13 +52,15 @@ const Blogs = () => {
     }
 
     return (
-        <div>
+        <div className='container'>
+            <h1>Blogs</h1>
             <Togglable buttonLabel='create new note' ref={toggleRef}>
                 <BlogForm addBlog={addBlog}/>
             </Togglable>
             <br/>
-            {/* {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={user.username === blog.user.username ? removeBlog : null} likeBlog={likeBlog}/>)} */}
-            {blogs.map(blog => <div key={blog.id} className='blog'><Link to={`/blogs/${blog.id}`}>{`${blog.title} ${blog.author}`}</Link></div>)}
+            <ListGroup>
+                {blogs.map(blog => <ListGroup.Item action variant='warning' key={blog.id}><Link to={`/blogs/${blog.id}`}>{`${blog.title} ${blog.author}`}</Link></ListGroup.Item>)}
+            </ListGroup>
         </div>
     )
 }
