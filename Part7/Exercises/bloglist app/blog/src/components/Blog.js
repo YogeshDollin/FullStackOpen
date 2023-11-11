@@ -1,3 +1,4 @@
+import CommentForm from './CommentForm'
 
 const Blog = ({blog, removeBlog, likeBlog}) => {
 
@@ -10,8 +11,9 @@ const Blog = ({blog, removeBlog, likeBlog}) => {
         evt.preventDefault()
         await removeBlog(blog)
     }
+
     return (
-        <div className="blog">
+        <div className='blog'>
             <div>
                 <h1>{blog.title} {blog.author}</h1>
                 <a href={blog.url}>{blog.url}</a>
@@ -23,6 +25,7 @@ const Blog = ({blog, removeBlog, likeBlog}) => {
                 { removeBlog && <button onClick={handleDeleteBlog}>remove</button> }
                 <br/>
                 <h3>comments</h3>
+                <CommentForm blog={blog}/>
                 <ul>
                     {
                         blog.comments && blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
@@ -32,13 +35,5 @@ const Blog = ({blog, removeBlog, likeBlog}) => {
         </div>
     )
 }
-
-// const Blog = () => {
-//     return (
-//         <div>
-//             This is individual blog
-//         </div>
-//     )
-// }
 
 export default Blog
