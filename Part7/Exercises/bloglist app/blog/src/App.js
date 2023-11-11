@@ -8,6 +8,8 @@ import notificationReducer from './store/notificationReducer'
 import AppContext from './context/appContext'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import Header from './components/Header'
+import { Route, Routes } from 'react-router-dom'
+import Users from './components/Users'
 
 function App() {
   const dispatch = useDispatch()
@@ -27,7 +29,10 @@ function App() {
       {user === null ? <LoginForm setUser={setUser}/> : <>
         <Header/>
         <QueryClientProvider client={new QueryClient()}>
-          <Blogs/>
+          <Routes>
+            <Route path='/users' element={<Users/>}/>
+            <Route path='/' element={<Blogs/>}/>
+          </Routes>
         </QueryClientProvider>
       </>}
     </AppContext.Provider>
