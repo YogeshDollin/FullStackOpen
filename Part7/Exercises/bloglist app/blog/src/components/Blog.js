@@ -10,7 +10,6 @@ const Blog = ({blog, removeBlog, likeBlog}) => {
         evt.preventDefault()
         await removeBlog(blog)
     }
-
     return (
         <div className="blog">
             <div>
@@ -22,6 +21,13 @@ const Blog = ({blog, removeBlog, likeBlog}) => {
                 added by{blog.author}
                 <br/>
                 { removeBlog && <button onClick={handleDeleteBlog}>remove</button> }
+                <br/>
+                <h3>comments</h3>
+                <ul>
+                    {
+                        blog.comments && blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
+                    }
+                </ul>
             </div>
         </div>
     )
