@@ -111,6 +111,7 @@ function App() {
           <Route path='/users' element={<Users users={users}/>}/>
           <Route path='/users/:id' element={<User user={selectedUser}/>}/>
           <Route path='/' element={<Blogs/>}/>
+          <Route path='/blogs' element={<Blogs />}/>
           <Route path='/blogs/:id' element={<Blog blog={selectedBlog} removeBlog={selectedBlog && user.username === selectedBlog.user.username ? removeBlog : null} likeBlog={likeBlog}/>}/>
         </Routes>
       </>}

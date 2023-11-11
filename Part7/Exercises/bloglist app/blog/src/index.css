@@ -19,3 +19,12 @@
     border: 2px solid;
     margin-bottom: 5px;
 }
+
+.header > .header-top-section{
+    background-color: rgb(158, 157, 157);
+    padding: 10px;
+}
+
+.header > .header-top-section a{
+    padding-right: 10px;
+}
