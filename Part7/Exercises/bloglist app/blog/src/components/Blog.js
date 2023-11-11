@@ -1,12 +1,5 @@
-import { useState } from 'react'
-import blogService from '../services/blogs'
 
 const Blog = ({blog, removeBlog, likeBlog}) => {
-    const [showContent, setShowContent] = useState(false)
-
-    const toggleShowContent = () => {
-        setShowContent(!showContent)
-    }
 
     const handleLikeClick = async (evt) => {
         evt.preventDefault()
@@ -20,23 +13,26 @@ const Blog = ({blog, removeBlog, likeBlog}) => {
 
     return (
         <div className="blog">
-            {showContent ?
-                <div>
-                    {blog.title} <button onClick={toggleShowContent}>hide</button>
-                    <br/>
-                    <a href={blog.url}>{blog.url}</a>
-                    <br/>
-                    likes {blog.likes}<button onClick={handleLikeClick}>like</button>
-                    <br/>
-                    {blog.author}
-                    <br/>
-                    { removeBlog && <button onClick={handleDeleteBlog}>remove</button> }
-                </div>
-                :
-                <div>{blog.title} {blog.author} <button onClick={toggleShowContent}>view</button></div>
-            }
+            <div>
+                <h1>{blog.title} {blog.author}</h1>
+                <a href={blog.url}>{blog.url}</a>
+                <br/>
+                likes {blog.likes}<button onClick={handleLikeClick}>like</button>
+                <br/>
+                added by{blog.author}
+                <br/>
+                { removeBlog && <button onClick={handleDeleteBlog}>remove</button> }
+            </div>
         </div>
     )
 }
+
+// const Blog = () => {
+//     return (
+//         <div>
+//             This is individual blog
+//         </div>
+//     )
+// }
 
 export default Blog

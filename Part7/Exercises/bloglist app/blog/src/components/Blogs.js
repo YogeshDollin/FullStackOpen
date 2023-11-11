@@ -1,21 +1,15 @@
 import { useRef, useContext } from 'react'
-import Blog from './Blog'
 import BlogForm from './BlogForm'
 import blogsService from '../services/blogs'
 import Togglable from './Togglable'
-import { useSelector, useDispatch } from 'react-redux'
 import { setNotificationAction, resetNotificationAction } from '../store/notificationReducer'
 import AppContext from '../context/appContext'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { Link } from 'react-router-dom'
 
 const Blogs = () => {
-    const dispatch = useDispatch()
     const queryClient = useQueryClient()
-    const result = useQuery({
-        queryKey: ['blogs'],
-        queryFn: () => blogsService.getAll().then(res => res.sort((b1, b2) => b1.likes < b2.likes)),
-        onError: (err) => {console.log(err)}
-    })
 
     const newBlogMutation = useMutation({
         mutationFn: blogsService.create,
@@ -33,43 +27,11 @@ const Blogs = () => {
             console.log(err)
         }
     })
-    const updateBlogMutation = useMutation({
-        mutationFn: blogsService.update,
-        onSuccess: (updatedBlog) => {
-            const fetchedBlogs = queryClient.getQueryData(['blogs'])
-            const updatedBlogs = []
-            fetchedBlogs.forEach(blog => {
-                if(blog.id === updatedBlog.id){
-                    updatedBlogs.push(updatedBlog)
-                }else{
-                    updatedBlogs.push(blog)
-                }
-            })
-            queryClient.setQueryData(['blogs'], updatedBlogs)
-        },
-        onError: (err) => {
-            console.log(err)
-        }
-    })
-    const removeBlogMutation = useMutation({
-        mutationFn: blogsService.remove,
-        onSuccess: (response, id) => {
-            const fetchedBlogs = queryClient.getQueryData(['blogs'])
-            queryClient.setQueryData(['blogs'], fetchedBlogs.filter( blog => blog.id !== id) )
-        },
-        onError: (err) => {
-            console.log(err)
-        }
-    })
-
+    
     const toggleRef = useRef()
-    const user = useSelector(state => state.user)
     const [notification, notificationDispatch] = useContext(AppContext)
-
-    if(result.isLoading){
-        return <p>loading data...</p>
-    }
-    const blogs = result.data
+    
+    const blogs = queryClient.getQueryData(['blogs'])
 
     const notifyWith = (message, type='info') => {
         notificationDispatch(setNotificationAction({type, message}))
@@ -88,30 +50,14 @@ const Blogs = () => {
         }
     }
 
-    const removeBlog = async (blog) => {
-        if(window.confirm(`Remove blog ${blog.title} by ${blog.author}`)){
-            // blogsService.remove(blog.id)
-            // dispatch(deleteBlog(blog))
-            removeBlogMutation.mutate(blog.id)
-        }
-    }
-
-    const likeBlog = async (blog) => {
-        const updatedBlog = {
-            ...blog,
-            likes: blog.likes + 1,
-            user: blog.user.id
-        }
-        updateBlogMutation.mutate(updatedBlog)
-    }
-
     return (
         <div>
             <Togglable buttonLabel='create new note' ref={toggleRef}>
                 <BlogForm addBlog={addBlog}/>
             </Togglable>
             <br/>
-            {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={user.username === blog.user.username ? removeBlog : null} likeBlog={likeBlog}/>)}
+            {/* {blogs.map( blog => <Blog key={blog.id} blog={blog} removeBlog={user.username === blog.user.username ? removeBlog : null} likeBlog={likeBlog}/>)} */}
+            {blogs.map(blog => <div key={blog.id} className='blog'><Link to={`/blogs/${blog.id}`}>{`${blog.title} ${blog.author}`}</Link></div>)}
         </div>
     )
 }
