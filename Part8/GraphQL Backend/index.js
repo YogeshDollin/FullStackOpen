@@ -39,9 +39,14 @@ const typeDefs = `
         id: ID!
     }
 
+    enum YesNo {
+        YES
+        NO
+    }
+
     type Query {
         personCount: Int!
-        allPersons: [Person!]!
+        allPersons(phone: YesNo): [Person!]!
         findPerson(name: String!): Person
     }
 
@@ -52,13 +57,21 @@ const typeDefs = `
             street: String!
             city: String!
         ): Person
+        editNumber(
+            name: String!
+            phone: String!
+        ): Person
     }
 `
 
 const resolvers = {
     Query: {
         personCount: () => persons.length,
-        allPersons:() => persons,
+        allPersons:(root, args) => {
+            if(!args.phone) return persons
+            const byPhone = (person) => args.phone === 'YES' ? person.phone : !person.phone
+            return persons.filter(byPhone)
+        },
         findPerson: (root, args) => persons.find(p => p.name === args.name)
     },
     Person: {
@@ -82,6 +95,13 @@ const resolvers = {
             const person = {...args, id: uuid()}
             persons = persons.concat(person)
             return person
+        },
+        editNumber: (root, args) => {
+            const existPerson = persons.find(p => p.name === args.name)
+            if(!existPerson) return null
+            const updatePerson = {...existPerson, phone: args.phone}
+            persons = persons.map(person => person.name === args.name ? updatePerson: person)
+            return updatePerson
         }
     }
 }
