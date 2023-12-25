@@ -4,7 +4,7 @@ import { useState } from "react"
 
 const Authors = (props) => {
   const result = useQuery(ALL_AUTHORS)
-  const [updateAuthor, setUpdateAuthor] = useState('')
+  const [selectedAuthor, setSelectedAuthor] = useState('')
   const [updateBorn, setUpdateBorn] = useState('')
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
@@ -25,14 +25,20 @@ const Authors = (props) => {
   const submit = e => {
     e.preventDefault()
 
-    console.log(updateAuthor)
+    console.log(selectedAuthor)
     console.log(updateBorn);
 
-    editAuthor({variables: {name: updateAuthor, born: Number(updateBorn)}})
+    editAuthor({variables: {name: selectedAuthor, born: Number(updateBorn)}})
 
     console.log('update author...')
-    setUpdateAuthor('')
+    setSelectedAuthor('')
     setUpdateBorn('')
+  }
+
+  const onSelectedAuthorHandler = e => {
+    setSelectedAuthor(e.target.value)
+    const findAuthor = authors.find(auth => auth.name === e.target.value)
+    setUpdateBorn(findAuthor.born)
   }
 
   return (
@@ -57,7 +63,12 @@ const Authors = (props) => {
       <br/>
       <h2>Set birthyear</h2>
       <form onSubmit={submit}>
-          <div>name <input type="text" name="name" value={updateAuthor} onChange={({target}) => setUpdateAuthor(target.value) }></input></div>
+          <div>
+            <select value={selectedAuthor} onChange={onSelectedAuthorHandler}>
+              <option value=''>Select</option>
+              {authors.map(author => <option value={author.name}>{author.name}</option>)}
+            </select>
+          </div>
           <div>born <input type="text" name="born" value={updateBorn} onChange={({target}) => setUpdateBorn(target.value)}></input></div>
           <button type="submit">update author</button>
       </form>
