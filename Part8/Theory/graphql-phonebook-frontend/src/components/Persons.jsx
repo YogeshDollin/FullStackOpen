@@ -19,10 +19,10 @@ const Persons = ({persons}) => {
     }
 
     if(!persons) return null
-
+    
     return (
         <div>
-            {persons.map(p => (<div key={p.id}>
+            {persons.map(p => (<div key={p.name}>
                 {p.name} {p.phone}
                 <button onClick={() => setNameToSearch(p.name)}>Show person</button>
             </div>))}

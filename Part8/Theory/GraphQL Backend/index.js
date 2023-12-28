@@ -113,7 +113,7 @@ const resolvers = {
             if(!args.phone) return Person.find({})
             return Person.find({phone: {exists: args.phone === 'YES'}})
         },
-        findPerson: async (root, args) => Person.find({name: args.name}),
+        findPerson: async (root, args) => Person.findOne({name: args.name}),
         me: async (root, args, context) => context.currentUser
     },
     Person: {
@@ -238,9 +238,6 @@ startStandaloneServer(server, {
             )
             const currentUser = await User.findById(decodedToken.id).populate('friends')
             return {currentUser}
-        }
-        else{
-            throw new Error('Invalid token')
         }
     }
 }).then(({url}) => {
