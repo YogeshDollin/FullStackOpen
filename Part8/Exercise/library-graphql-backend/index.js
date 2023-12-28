@@ -5,6 +5,7 @@ const {v1: uuid} = require('uuid')
 const Author = require('./models/author')
 const Book = require('./models/book')
 const { default: mongoose } = require('mongoose')
+const { GraphQLError } = require('graphql')
 require('dotenv').config()
 
 const MONGODB_URI = process.env.MONGODB_URI
@@ -167,12 +168,21 @@ const resolvers = {
       //   authors = authors.concat({name: args.author, id: uuid()})
       // }
       // return newBook
-      const author = new Author({name: args.author})
-      await author.save()
-      // const author = await Author.findOne({name: args.author})
+      // const author = new Author({name: args.author})
+      // await author.save()
+      const author = await Author.findOne({name: args.author})
       if(author){
         const newBook = new Book({title: args.title, published: args.published, author: author, genres: args.genres})
         return newBook.save()
+          .catch(error => {
+            throw new GraphQLError('Failed to add book', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                invalidArgs: {...args},
+                error
+              }
+            })
+          })
       }
     },
     editAuthor: async (root, args) => {
@@ -182,9 +192,25 @@ const resolvers = {
       // authors = authors.map(author => author.name === args.name ? updatedAuthor : author)
       // return updatedAuthor
       const author = await Author.findOne({name: args.name})
-      if(!author) return null
+      if(!author)
+        throw new GraphQLError('Author does not exist', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name
+          }
+        })
       author.born = args.setBornTo
-      await author.save()
+      try {
+        await author.save()  
+      } catch (error) {
+        throw new GraphQLError('Failed to update', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: {...args},
+            error
+          }
+        })
+      }
 
       return author
     }
