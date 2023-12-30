@@ -3,8 +3,12 @@ import {ALL_BOOKS} from './Queries'
 import { useState } from "react"
 
 const Books = (props) => {
-  const result = useQuery(ALL_BOOKS)
-  const [selctedGenre, setSeclectedGenre] = useState('')
+  const [selectedGenre, setSeclectedGenre] = useState('')
+  const result = useQuery(ALL_BOOKS, {
+    variables: {
+      genre: selectedGenre
+    }
+  })
   if (!props.show) {
     return null
   }
@@ -13,7 +17,7 @@ const Books = (props) => {
     return <div>Loading Books ...</div>
   }
 
-  const books = result.data.allBooks.filter(book => selctedGenre ? book.genres.includes(selctedGenre) : true)
+  const books = result.data.allBooks.filter(book => selectedGenre ? book.genres.includes(selectedGenre) : true)
 
   return (
     <div>
