@@ -5,7 +5,7 @@ import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/recommend'
 import { useSubscription } from '@apollo/client'
-import { BOOK_ADDED } from './components/Queries'
+import { ALL_BOOKS, BOOK_ADDED } from './components/Queries'
 
 const DEFAULT_PAGE = 'authors'
 
@@ -19,9 +19,14 @@ const App = () => {
   }, [])
 
   useSubscription(BOOK_ADDED, {
-    onData: ({data}) => {
+    onData: ({data, client}) => {
       console.log(data);
-      alert(data)
+      alert(`'${data.data.bookAdded.title}' added in library`)
+      client.cache.updateQuery({query: ALL_BOOKS, variables: {genre: ''}}, ({allBooks}) => {
+        return {
+          allBooks: allBooks.concat(data.data.bookAdded)
+        }
+      })
     }
   })
 
