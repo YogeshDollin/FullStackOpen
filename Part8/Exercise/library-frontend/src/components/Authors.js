@@ -20,7 +20,7 @@ const Authors = (props) => {
     return <div>Loading authors ...</div>
   }
 
-  const authors = result.data.allAuthors
+  const authors = result.data ? result.data.allAuthors : []
 
   const submit = e => {
     e.preventDefault()

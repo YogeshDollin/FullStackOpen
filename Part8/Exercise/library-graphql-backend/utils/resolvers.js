@@ -4,6 +4,7 @@ const User = require('../models/user')
 const { GraphQLError } = require('graphql')
 const jwt = require('jsonwebtoken')
 const {PubSub} = require('graphql-subscriptions')
+const book = require('../models/book')
 const pubSub = new PubSub()
 
 const resolvers = {
@@ -18,7 +19,21 @@ const resolvers = {
         return args.genre ? Book.find({genres: args.genre}).populate('author') : Book.find({}).populate('author')
       },
       allAuthors: async () => {
-        return Author.find({})
+        console.log('allAuthors');
+        const dict = {}
+        const allAuthors = await Author.find({})
+        allAuthors.forEach(author => {
+          dict[author.id] = {name: author.name, born: author.born, id: author.id, bookCount: 0}
+        });
+        
+        const allBooks = await Book.find({})
+        console.log(allBooks);
+        allBooks.forEach(book => {
+          const author = dict[book.author]
+          dict[book.author] = {...author, bookCount: author.bookCount + 1}
+        });
+        
+        return Object.values(dict)
       },
       me: (root, args, context) => context.currentUser
     },
