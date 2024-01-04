@@ -1,15 +1,21 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const {v1: uuid} = require('uuid')
 
-const Author = require('./models/author')
-const Book = require('./models/book')
 const User = require('./models/user')
 const { default: mongoose } = require('mongoose')
-const { GraphQLError } = require('graphql')
 require('dotenv').config()
 
 const jwt = require('jsonwebtoken')
+const typeDefs = require('./utils/schema')
+const resolvers = require('./utils/resolvers')
+
+const express = require('express')
+const {makeExecutableSchema} = require('@graphql-tools/schema')
+const {ApolloServerPluginDrainHttpServer} = require('@apollo/server/plugin/drainHttpServer')
+const cors = require('cors')
+const {expressMiddleware} = require('@apollo/server/express4')
+const {WebSocketServer} = require('ws')
+const {useServer} = require('graphql-ws/lib/use/ws')
 
 const MONGODB_URI = process.env.MONGODB_URI
 console.log('connecting to DB')
@@ -46,21 +52,6 @@ let authors = [
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
 ]
-
-/*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
- * Spanish:
- * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
- * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conección con el libro
-*/
-
 let books = [
   {
     title: 'Clean Code',
@@ -112,174 +103,59 @@ let books = [
     genres: ['classic', 'revolution']
   },
 ]
-
-/*
-  you can remove the placeholder query once your first one has been implemented 
-*/
-
-const typeDefs = `
-    type Book {
-        title: String!
-        published: Int!
-        author: Author!
-        id: ID!
-        genres: [String!]!
-    }
-    type Author {
-        name: String!
-        born: Int
-        bookCount: Int!
-    }
-    type User {
-      username: String!
-      favoriteGenre: String!
-      id: ID!
-    }
-    type Token {
-      value: String!
-    }
-    type Query {
-        bookCount: Int!
-        authorCount: Int!
-        allBooks(author: String, genre: String): [Book!]!
-        allAuthors: [Author!]!
-        me: User!
-    }
-    type Mutation {
-      addBook(title: String!, author: String!, published: Int!, genres: [String]!): Book
-      editAuthor(name: String!, setBornTo: Int!): Author
-      createUser(
-        username: String!
-        favoriteGenre: String!
-      ): User
-      login(
-        username: String!
-        password: String!
-      ): Token
-    }
-`
-
-const resolvers = {
-  Query: {
-    bookCount: () => Book.collection.countDocuments(),
-    authorCount: () => Author.collection.countDocuments() ,
-    allBooks : async (root, args) => {
-      // if(args.author && args.genre){
-      //   return books.filter( book => book.author === args.author && book.genres.includes(args.genre))
-      // }
-      // return args.author ? books.filter(book => book.author === args.author): args.genre ? books.filter(book => book.genres.includes(args.genre)) : books
-      return args.genre ? Book.find({genres: args.genre}).populate('author') : Book.find({}).populate('author')
-    },
-    allAuthors: async () => {
-      return Author.find({})
-    },
-    me: (root, args, context) => context.currentUser
-  },
-  Mutation: {
-    addBook: async (root, args, context) => {
-      if(!context.currentUser)
-        throw new GraphQLError('User not authenticated', {
-          extensions: {
-            code:'BAD_USER_INPUT'
-          }})
-      const author = await Author.findOne({name: args.author})
-      if(author){
-        const newBook = new Book({title: args.title, published: args.published, author: author, genres: args.genres})
-        return newBook.save()
-          .catch(error => {
-            throw new GraphQLError('Failed to add book', {
-              extensions: {
-                code: 'BAD_USER_INPUT',
-                invalidArgs: {...args},
-                error
-              }
-            })
-          })
-      }
-    },
-    editAuthor: async (root, args, context) => {
-      // const author = authors.find(author => author.name === args.name)
-      // if(!author) return null
-      // const updatedAuthor = {...author, born: args.setBornTo}
-      // authors = authors.map(author => author.name === args.name ? updatedAuthor : author)
-      // return updatedAuthor
-      if(!context.currentUser)
-        throw new GraphQLError('User not authenticated', {
-          extensions: {
-            code:'BAD_USER_INPUT'
-          }})
-
-      const author = await Author.findOne({name: args.name})
-      if(!author)
-        throw new GraphQLError('Author does not exist', {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.name
-          }
-        })
-      author.born = args.setBornTo
-      try {
-        await author.save()  
-      } catch (error) {
-        throw new GraphQLError('Failed to update', {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: {...args},
-            error
-          }
-        })
-      }
-
-      return author
-    },
-    createUser: async (root, args) => {
-      const user = new User({username: args.username, favoriteGenre: args.favoriteGenre})
-      return user.save()
-        .catch(error => {
-          throw new GraphQLError('failed to create user', {
-            extensions: {
-              code: 'BAD_USER_INPUT',
-              invalidArgs: args.username,
-              error
-            }
-          })
-        })
-    },
-    login: async (root, args) => {
-      const user = await User.findOne({username: args.username})
-      if(!user || args.password !== 'wordpass'){
-        throw new GraphQLError('Wrong credentials', {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-          }
-        })
-      }
-      const userForToken = {
-        username: user.username,
-        id: user._id
-      }
-      return {value: jwt.sign(userForToken, process.env.SECRET_KEY)}
-    }
-  }
-}
-
 const server = new ApolloServer({
   typeDefs,
-  resolvers,
+  resolvers
 })
 
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({req, res}) => {
-    const auth = req ? req.headers.authorization : null
-    if(auth && auth.startsWith('Bearer ')){
-      const decodedToken = jwt.verify(
-        auth.substring(7), process.env.SECRET_KEY
-      )
-      const currentUser = await User.findById(decodedToken.id)
-      return {currentUser}
-    }
-  }
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`)
-})
+const start = async () => {
+  const http = require('http')
+  const app = express()
+
+  const httpServer = http.createServer(app)
+
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/'
+  })
+
+  const schema = makeExecutableSchema({typeDefs, resolvers})
+  const serverCleanup = useServer({schema}, wsServer)
+
+  const server = new ApolloServer({
+    schema,
+    plugins: [ApolloServerPluginDrainHttpServer({httpServer}), {
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose()
+          }
+        }
+      }
+    }]
+  })
+
+  await server.start()
+
+  app.use(
+    '/',
+    cors(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({req}) => {
+        const auth = req ? req.headers.authorization : null
+        if(auth && auth.startsWith('Bearer ')){
+          const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET_KEY)
+          const currentUser = User.findById(decodedToken.id)
+          return {currentUser}
+        }
+      }
+    })
+  )
+
+  const PORT = 4000
+  httpServer.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  })
+}
+start()
