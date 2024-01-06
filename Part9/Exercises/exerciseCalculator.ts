@@ -10,10 +10,32 @@ interface ExerciseResult {
     average: number;
 }
 
+interface ParseReturnType {
+    target: number;
+    exercises: number[]
+}
+
+const parseArguments = (args: string[]): ParseReturnType => {
+    if(args.length < 4) throw new Error('Not enough arguments');
+    const [, , target, ...rest] = args
+    try {
+        return {
+            target: Number(target),
+            exercises: rest.map(num => Number(num))
+        }
+    } catch (error) {
+        let errorMessage = 'Something went wrong';
+        if(error instanceof Error){
+            errorMessage += 'Error: ' + error.message
+        }
+        console.log(errorMessage);        
+    }
+}
+
 const calculateExercises = (inputs: number[], target: number): ExerciseResult => {
     const periodLength = inputs.length;
     const trainingDays = inputs.filter(num => num !== 0).length
-    const average = inputs.reduce((acc:number, currentValue: number) => acc + currentValue) / 7
+    const average = inputs.reduce((acc:number, currentValue: number) => acc + currentValue) / periodLength
     const success = average === target
     const rating = 2
     const ratingDescription = 'not too bad but could be better'
@@ -29,4 +51,6 @@ const calculateExercises = (inputs: number[], target: number): ExerciseResult =>
     }
 }
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+const {target, exercises} = parseArguments(process.argv)
+
+console.log(calculateExercises(exercises, target));
