@@ -1,5 +1,5 @@
 const express = require('express')
-import diaryRouter from './routes/diaries';
+import diaryRouter from './routes/diariesRoutes';
 const app = express()
 
 app.get('/ping', (_req: any, res: { send: (arg0: string) => void; }) => {
