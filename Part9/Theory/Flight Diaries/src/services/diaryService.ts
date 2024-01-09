@@ -28,4 +28,4 @@ const findById = (id: number): DiaryEntry | undefined => {
     return entry;
 };
 
-export default {getEntries, getNonSensistiveEntries, addEntry, findById}
+export default {getEntries, getNonSensistiveEntries, addEntry, findById};

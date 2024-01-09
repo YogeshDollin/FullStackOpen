@@ -1,6 +1,7 @@
-import { DiaryEntry } from "../types"
+import { DiaryEntry } from "../types";
+import utils from "../utils";
 
-const diaries: DiaryEntry[] = [
+const data = [
     {
         "id": 1,
         "date": "2017-01-01",
@@ -29,6 +30,12 @@ const diaries: DiaryEntry[] = [
         "visibility": "good",
         "comment": "I almost failed the landing but I survived"
     }
-]
+];
 
-export default diaries
+const diaries: DiaryEntry[] = data.map(obj => {
+    const object = utils.toNewDiaryEntry(obj) as DiaryEntry;
+    object.id = obj.id;
+    return object;
+});
+
+export default diaries;
