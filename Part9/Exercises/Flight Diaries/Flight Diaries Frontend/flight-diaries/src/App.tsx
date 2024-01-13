@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { NonSensitivieDiaryEntry } from './types';
+import { NewDiaryEntry, NonSensitivieDiaryEntry } from './types';
 import diariesService from './services/diariesService';
+import Diaries from './components/Diaries';
+import DiaryForm from './components/DiaryForm';
 
 function App() {
   const [diaries, setDiaries] = useState<NonSensitivieDiaryEntry[]>([]);
@@ -9,16 +11,15 @@ function App() {
       .then(data => setDiaries(data));
   }, [])
 
+  const addEntry = (newDiary: NewDiaryEntry) => {
+    diariesService.addEntry(newDiary)
+      .then(data => diaries.concat(data));
+  }
+
   return (
     <>
-      <h1>Diary Entries</h1>
-      {diaries.map(diary => (
-        <div key={diary.id}>
-          <h2>{diary.date}</h2>
-          <p>Visibility: {diary.visibility}</p>
-          <p>weather: {diary.weather}</p>
-        </div>
-      ))}
+      <DiaryForm addEntry={addEntry}/>
+      <Diaries diaries={diaries}/>
     </>
   )
 }
