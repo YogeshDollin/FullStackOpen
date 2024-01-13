@@ -18,15 +18,22 @@ const DiaryForm = ({addEntry}: {addEntry: (d: NewDiaryEntry) => void}) => {
             <form onSubmit={submitHandler}>
                 <div>
                     <label>date</label>
-                    <input type="text" value={date} onChange={e => setDate(e.target.value)}></input>
+                    <input type="date" value={date} onChange={e => setDate(e.target.value)}></input>
                 </div>
                 <div>
                     <label>visibility</label>
-                    <input type="text" value={visibility} onChange={(e) => setVisibility(e.target.value)}></input>
+                    <label><input type="radio" value='great' onChange={(e) => setVisibility(e.target.value)}></input>great</label>
+                    <label><input type="radio" value='good' onChange={(e) => setVisibility(e.target.value)}></input>good</label>
+                    <label><input type="radio" value='ok' onChange={(e) => setVisibility(e.target.value)}></input>ok</label>
+                    <label><input type="radio" value='poor' onChange={(e) => setVisibility(e.target.value)}></input>poor</label>
                 </div>
                 <div>
                     <label>weather</label>
-                    <input type="text" value={weather} onChange={({target}) => setWeather(target.value)}></input>
+                    <label><input type="radio" value='sunny' onChange={(e) => setWeather(e.target.value)}></input>sunny</label>
+                    <label><input type="radio" value='rainy' onChange={(e) => setWeather(e.target.value)}></input>rainy</label>
+                    <label><input type="radio" value='cloudy' onChange={(e) => setWeather(e.target.value)}></input>cloudy</label>
+                    <label><input type="radio" value='stormy' onChange={(e) => setWeather(e.target.value)}></input>stormy</label>
+                    <label><input type="radio" value='windy' onChange={(e) => setWeather(e.target.value)}></input>windy</label>
                 </div>
                 <div>
                     <label>comment</label>
