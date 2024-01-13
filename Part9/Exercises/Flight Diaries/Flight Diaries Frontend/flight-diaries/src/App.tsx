@@ -6,6 +6,7 @@ import DiaryForm from './components/DiaryForm';
 
 function App() {
   const [diaries, setDiaries] = useState<NonSensitivieDiaryEntry[]>([]);
+  const [error, setError] = useState('');
   useEffect(() => {
     diariesService.getDiaries()
       .then(data => setDiaries(data));
@@ -13,11 +14,20 @@ function App() {
 
   const addEntry = (newDiary: NewDiaryEntry) => {
     diariesService.addEntry(newDiary)
-      .then(data => diaries.concat(data));
+      .then(data => setDiaries(diaries.concat(data)))
+      .catch((error: Error) => Notify(error.message));
+  }
+
+  const Notify = (message: string) => {
+    setError(message);
+    setTimeout(() => {
+      setError('');
+    }, 5000);
   }
 
   return (
     <>
+      <p style={{color: 'red'}}>{error}</p>
       <DiaryForm addEntry={addEntry}/>
       <Diaries diaries={diaries}/>
     </>

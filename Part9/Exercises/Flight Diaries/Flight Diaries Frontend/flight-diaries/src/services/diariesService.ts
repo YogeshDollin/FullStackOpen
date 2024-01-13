@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { DiaryEntry, NewDiaryEntry, NonSensitivieDiaryEntry } from '../types';
 
 const baseUrl = 'http://localhost:3003/api/diaries';
@@ -10,7 +10,8 @@ const getDiaries = () => {
 
 const addEntry = (newDiary: NewDiaryEntry) => {
     return axios.post<DiaryEntry>(baseUrl, newDiary)
-        .then(res => res.data);
+        .then(res => res.data)
+        .catch((err: AxiosError) => {throw new Error(err.message);} );
 }
 
 export default {getDiaries, addEntry};
