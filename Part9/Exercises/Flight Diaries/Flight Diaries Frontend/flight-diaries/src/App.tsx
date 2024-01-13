@@ -1,33 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { NonSensitivieDiaryEntry } from './types';
+import diariesService from './services/diariesService';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [diaries, setDiaries] = useState<NonSensitivieDiaryEntry[]>([]);
+  useEffect(() => {
+    diariesService.getDiaries()
+      .then(data => setDiaries(data));
+  }, [])
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>Diary Entries</h1>
+      {diaries.map(diary => (
+        <div key={diary.id}>
+          <h2>{diary.date}</h2>
+          <p>Visibility: {diary.visibility}</p>
+          <p>weather: {diary.weather}</p>
+        </div>
+      ))}
     </>
   )
 }
