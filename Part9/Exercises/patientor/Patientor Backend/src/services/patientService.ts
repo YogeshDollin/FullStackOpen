@@ -24,3 +24,8 @@ export const getNonSensitivePatientsData = (): NonSensitivePatientsDataType[] =>
             occupation
         }));
 };
+
+export const getPatient = (id: string): PatientsType | null => {
+    const patient = patientsData.find(p => p.id === id);
+    return patient ? patient : null;
+}

@@ -4,18 +4,23 @@ export type DiagnosesType = {
     latin?: string;
 }
 
+export interface Entry{
+
+}
+
 export type PatientsType = {
     id: string,
     name: string,
     dateOfBirth: string,
     ssn: string,
     gender: string,
-    occupation: string
+    occupation: string,
+    entries: Entry[]
 }
 
 export type NewPatientType = Omit<PatientsType, 'id'>
 
-export type NonSensitivePatientsDataType = Omit<PatientsType, 'ssn'>
+export type NonSensitivePatientsDataType = Omit<PatientsType, 'ssn' | 'entries'>
 
 export enum Gender {
     Male = 'male',
