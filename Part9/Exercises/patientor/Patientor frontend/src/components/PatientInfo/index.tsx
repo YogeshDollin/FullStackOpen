@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
-import { Diagnosis, Gender, Patient } from "../../types";
+import { Diagnosis, Entry, Gender, Patient } from "../../types";
 import patientService from "../../services/patientService";
 import MaleOutlinedIcon from '@mui/icons-material/MaleOutlined';
 import FemaleOutlinedIcon from '@mui/icons-material/FemaleOutlined';
 import diagnosisService from "../../services/diagnosisService";
+import HospitalEntryComponent from "../Entry/HospitalEntry";
+import OccupationalHealthcareEntryComponent from "../Entry/OccupationHealthcareEntry";
+import HealthCheckEntryComponent from "../Entry/HealthCheckEntry";
+import { Box } from "@mui/material";
 
 const PatientInfo = () => {
     const {id} = useParams();
@@ -20,6 +24,17 @@ const PatientInfo = () => {
 
     if(!patient) return null;
 
+    const getEntryComponent = (entry: Entry) => {
+        switch (entry.type) {
+            case 'Hospital':
+                return <HospitalEntryComponent entry={entry}/>;
+            case 'OccupationalHealthcare':
+                return <OccupationalHealthcareEntryComponent entry={entry}/>;
+            default:
+                return <HealthCheckEntryComponent entry={entry}/>;
+        }
+    }
+
     return (
         <div>
             <h2>{patient.name} {patient.gender === Gender.Male ? <MaleOutlinedIcon/> : patient.gender === Gender.Female ? <FemaleOutlinedIcon/> : null}</h2>
@@ -33,14 +48,17 @@ const PatientInfo = () => {
 
             <h2>entries</h2>
             <br></br>
-            {patient.entries.map(entry => (
+            {/* {patient.entries.map(entry => (
                 <div key={entry.id}>
                     <p>{entry.date} {entry.description}</p>
                     <ul>
-                        {entry.diagnosisCodes?.map((d,i) => <li key={i}> {d} {diagnosis?.find(diagnose => diagnose.code === d)?.name}</li>)}
+                        {entry.diagnosisCodes?.map((d,i) => <li key={i}> {d} <i>{diagnosis?.find(diagnose => diagnose.code === d)?.name}</i></li>)}
                     </ul>
                 </div>
-            ))}
+            ))} */}
+            {
+                patient.entries.map(entry => <Box key={entry.id} sx={{border: 2, marginTop: 3, marginBottom: 3, padding: 3}} >{getEntryComponent(entry)}</Box>)
+            }
 
         </div>
     );
