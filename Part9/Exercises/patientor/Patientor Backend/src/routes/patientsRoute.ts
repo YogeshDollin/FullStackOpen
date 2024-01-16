@@ -1,6 +1,7 @@
 import express from 'express';
-import { addPatient, getNonSensitivePatientsData, getPatient } from '../services/patientService';
-import toNewPatientEntry from '../utils';
+import { addEntry, addPatient, getNonSensitivePatientsData, getPatient } from '../services/patientService';
+import {parseEntry, toNewPatientEntry} from '../utils';
+import { EntryWithoutId } from '../types';
 const patientsRouter = express.Router();
 
 patientsRouter.get('/patients', (_req, res) => {
@@ -20,6 +21,13 @@ patientsRouter.post('/patients', (req, res) => {
     const newPatient = toNewPatientEntry(req.body);
     const addedPatient = addPatient(newPatient);
     res.json(addedPatient);
+})
+
+patientsRouter.post('/patients/:id/entries', (req, res) => {
+    const id = req.params.id;
+    const newEntry: EntryWithoutId = parseEntry(req.body);
+    const patientWithAddedEntry = addEntry(id, newEntry);
+    res.json(patientWithAddedEntry);
 })
 
 export default patientsRouter;

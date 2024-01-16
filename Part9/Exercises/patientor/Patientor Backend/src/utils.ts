@@ -1,4 +1,4 @@
-import { Gender, NewPatientType } from "./types";
+import { DiagnosesType, Discharge, EntryWithoutId, Gender, HealthCheckEntry, HospitalEntry, NewPatientType, OccupationalHealthcareEntry } from "./types";
 
 const isString = (text: unknown): text is string => {
     return typeof text === 'string' || text instanceof String;
@@ -46,7 +46,7 @@ const parseOccupation = (occupation: unknown): string =>{
     return occupation;
 };
 
-const toNewPatientEntry = (object: unknown): NewPatientType => {
+export const toNewPatientEntry = (object: unknown): NewPatientType => {
     if(!object || typeof object !== 'object'){
         throw new Error('Incorrect or missing data');
     }
@@ -63,6 +63,78 @@ const toNewPatientEntry = (object: unknown): NewPatientType => {
         return newPatient;
     }
     throw new Error('Incorrect or missing data');
+};
+
+export const parseDiagnosisCodes = (object: unknown): Array<DiagnosesType['code']> => {
+    if(!object || typeof object !== 'object' || !('diagnosisCodes' in object)){
+        return [] as Array<DiagnosesType['code']>;
+    }
+    return object.diagnosisCodes as Array<DiagnosesType['code']>;
+};
+
+export const parseEntry = (object: unknown): EntryWithoutId => {
+    if(!object || typeof object !== 'object' || !('description' in object) || !('date' in object) || !('specialist' in object) || !('type' in object)){
+        throw new Error('Invalid or required parameters (description, date, specialist, type) must be provided');
+    }
+    switch (object.type) {
+        case 'Hospital':
+            return parseHospitalEntry(object as HospitalEntry);
+        case 'HealthCheck':
+            return parseHealthCheckEntry(object as HealthCheckEntry);
+        case 'OccupationHealthcare':
+            return parseOccupationalHealthcareEntry(object as OccupationalHealthcareEntry);
+        default:
+            throw new Error('Invalid entry type');
+    }
 }
 
-export default toNewPatientEntry
+const parseDischarge = (object: Omit<HospitalEntry, 'id'>): Discharge => {
+    if(!('date' in object.discharge) || !('criteria' in object.discharge)){
+        throw new Error('date and criteria is required');
+    }
+    return {date: object.discharge.date, criteria: object.discharge.criteria};
+}
+
+const parseHospitalEntry = (object: Omit<HospitalEntry, 'id'>): Omit<HospitalEntry, 'id'> => {
+    if(!('discharge' in object)){
+        throw new Error(`'discharge parameter is required`);
+    }
+    return {
+        description: object.description,
+        date: object.date,
+        specialist: object.specialist,
+        diagnosisCodes: parseDiagnosisCodes(object),
+        type: object.type,
+        discharge: parseDischarge(object)
+    }
+}
+
+const parseHealthCheckEntry = (object: Omit<HealthCheckEntry, 'id'>) : Omit<HealthCheckEntry, 'id'> => {
+    if(!('healthCheckRating' in object)){
+        throw new Error('healthCheckRating parameter is required.');
+    }
+    return {
+        description: object.description,
+        date: object.date,
+        specialist: object.specialist,
+        diagnosisCodes: parseDiagnosisCodes(object),
+        type: object.type,
+        healthCheckRating: object.healthCheckRating
+    }
+}
+
+const parseOccupationalHealthcareEntry = (object: Omit<OccupationalHealthcareEntry, 'id'>): Omit<OccupationalHealthcareEntry, 'id'> => {
+    if(!('employerName' in object)){
+        throw new Error('employerName is required');
+    }
+    return {
+        description: object.description,
+        date: object.date,
+        specialist: object.specialist,
+        diagnosisCodes: parseDiagnosisCodes(object),
+        type: object.type,
+        employerName: object.employerName,
+        sickLeave: object.sickLeave
+    };
+}
+
