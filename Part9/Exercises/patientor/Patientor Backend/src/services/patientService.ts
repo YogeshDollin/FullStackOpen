@@ -43,7 +43,8 @@ export const addEntry = (id: string, entry : EntryWithoutId): PatientsType => {
             break;
         }
     }
-    if(!patientIndex) throw new Error('Patient not found');
+    
+    if(patientIndex < 0) throw new Error('Patient not found');
     patientsData[patientIndex].entries = patientsData[patientIndex].entries.concat(newEntry);
     return patientsData[patientIndex];
 
