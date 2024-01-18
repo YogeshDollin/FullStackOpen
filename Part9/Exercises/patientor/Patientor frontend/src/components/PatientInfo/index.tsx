@@ -46,7 +46,7 @@ const PatientInfo = () => {
         }, 5000);
     }
 
-    const onSubmit = (healthCheckEntry: {description: string, date: string, specialist:string, healthCheckRating:string, diagnosisCodes:string}) =>{
+    const onSubmit = (healthCheckEntry: {description: string, date: string, specialist:string, healthCheckRating:string, diagnosisCodes:string[] | null}) =>{
         patientService.addEntry({...healthCheckEntry, type: 'HealthCheck', id})
             .then(data => setPatient(data))
             .catch(error => NotifyError(error.message))
