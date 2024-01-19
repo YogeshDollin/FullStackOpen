@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
-import { Diagnosis, Entry, Gender, HealthCheckEntry, Patient } from "../../types";
+import { Diagnosis, Entry, EntryWithoutId, Gender, Patient } from "../../types";
 import patientService from "../../services/patientService";
 import MaleOutlinedIcon from '@mui/icons-material/MaleOutlined';
 import FemaleOutlinedIcon from '@mui/icons-material/FemaleOutlined';
@@ -8,7 +8,7 @@ import diagnosisService from "../../services/diagnosisService";
 import HospitalEntryComponent from "../Entry/HospitalEntry";
 import OccupationalHealthcareEntryComponent from "../Entry/OccupationHealthcareEntry";
 import HealthCheckEntryComponent from "../Entry/HealthCheckEntry";
-import { Alert, Box, Button, Link } from "@mui/material";
+import { Alert, Box, Button } from "@mui/material";
 import AddEntryForm from "./AddEntryForm";
 
 const PatientInfo = () => {
@@ -46,8 +46,8 @@ const PatientInfo = () => {
         }, 5000);
     }
 
-    const onSubmit = (healthCheckEntry: {description: string, date: string, specialist:string, healthCheckRating:string, diagnosisCodes:string[] | null}) =>{
-        patientService.addEntry({...healthCheckEntry, type: 'HealthCheck', id})
+    const onSubmit = (healthCheckEntry: EntryWithoutId) =>{
+        patientService.addEntry({entry: healthCheckEntry, id})
             .then(data => setPatient(data))
             .catch(error => NotifyError(error.message))
     }

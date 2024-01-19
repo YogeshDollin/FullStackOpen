@@ -73,6 +73,7 @@ export const parseDiagnosisCodes = (object: unknown): Array<DiagnosesType['code'
 };
 
 export const parseEntry = (object: unknown): EntryWithoutId => {
+    console.log(object);
     if(!object || typeof object !== 'object' || !('description' in object) || !('date' in object) || !('specialist' in object) || !('type' in object)){
         throw new Error('Invalid or required parameters (description, date, specialist, type) must be provided');
     }
@@ -81,7 +82,7 @@ export const parseEntry = (object: unknown): EntryWithoutId => {
             return parseHospitalEntry(object as HospitalEntry);
         case 'HealthCheck':
             return parseHealthCheckEntry(object as HealthCheckEntry);
-        case 'OccupationHealthcare':
+        case 'OccupationalHealthcare':
             return parseOccupationalHealthcareEntry(object as OccupationalHealthcareEntry);
         default:
             throw new Error('Invalid entry type');
